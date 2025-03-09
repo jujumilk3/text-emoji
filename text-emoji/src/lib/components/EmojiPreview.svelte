@@ -366,8 +366,8 @@
 			let offset;
 
 			if (animationDirection === 'reverse') {
-				// Right to left
-				offset = progress * totalMovement;
+				// Left to right (now reverse means left to right)
+				offset = (1 - progress) * totalMovement;
 			} else if (animationDirection === 'alternate') {
 				// Alternate between directions
 				const cycle = Math.floor(progress * 2);
@@ -375,8 +375,8 @@
 				offset =
 					cycle % 2 === 0 ? cycleProgress * totalMovement : (1 - cycleProgress) * totalMovement;
 			} else {
-				// Left to right (normal)
-				offset = (1 - progress) * totalMovement;
+				// Right to left (now normal means right to left)
+				offset = progress * totalMovement;
 			}
 
 			// Draw the portion of the sliding text canvas that should be visible
