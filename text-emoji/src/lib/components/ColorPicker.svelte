@@ -31,9 +31,15 @@
 					placeholder="#000000"
 				/>
 				<div
-					class="-ml-px flex h-full w-12 items-center justify-center rounded-r-md border border-gray-300 bg-gray-50 px-3 py-2"
+					class="relative -ml-px flex h-full w-12 cursor-pointer items-center justify-center rounded-r-md border border-gray-300 bg-gray-50 px-3 py-2"
 				>
 					<PencilIcon />
+					<input
+						type="color"
+						bind:value={textColor}
+						class="absolute inset-0 cursor-pointer opacity-0"
+						aria-label="Pick text color"
+					/>
 				</div>
 			</div>
 		</div>
@@ -52,9 +58,15 @@
 					placeholder="#ffffff"
 				/>
 				<div
-					class="-ml-px flex h-full w-12 items-center justify-center rounded-r-md border border-gray-300 bg-gray-50 px-3 py-2"
+					class="relative -ml-px flex h-full w-12 cursor-pointer items-center justify-center rounded-r-md border border-gray-300 bg-gray-50 px-3 py-2"
 				>
 					<PencilIcon />
+					<input
+						type="color"
+						bind:value={backgroundColor}
+						class="absolute inset-0 cursor-pointer opacity-0"
+						aria-label="Pick background color"
+					/>
 				</div>
 			</div>
 		</div>
@@ -88,9 +100,15 @@
 							placeholder="#e0f2fe"
 						/>
 						<div
-							class="-ml-px flex h-full w-12 items-center justify-center rounded-r-md border border-gray-300 bg-gray-50 px-3 py-2"
+							class="relative -ml-px flex h-full w-12 cursor-pointer items-center justify-center rounded-r-md border border-gray-300 bg-gray-50 px-3 py-2"
 						>
 							<PencilIcon />
+							<input
+								type="color"
+								bind:value={gradientColor}
+								class="absolute inset-0 cursor-pointer opacity-0"
+								aria-label="Pick gradient color"
+							/>
 						</div>
 					</div>
 				</div>
