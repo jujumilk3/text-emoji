@@ -68,6 +68,7 @@
 
 	// Watch for changes in all properties to trigger rendering
 	$effect(() => {
+		console.log('effect');
 		// Create a dependency on all properties that should trigger a render
 		const _ = [
 			text,
@@ -398,15 +399,19 @@
 				background: backgroundColor
 			});
 
+			console.log('gif', gif);
+
 			// Number of frames to capture for one animation cycle
 			const framesCount = 30; // Increased for smoother animation
 			const frameDelay = Math.max(50, animationSpeed / framesCount); // Ensure minimum delay of 50ms per frame
 
 			// Stop any running animation to control our own rendering
-			stopAnimation();
+			// stopAnimation();
 
 			// Add frames to the GIF
 			for (let i = 0; i < framesCount; i++) {
+				console.log('i', i);
+
 				// Calculate progress for this frame (0 to 1)
 				const progress = i / framesCount;
 
@@ -424,6 +429,8 @@
 				}
 			}
 
+			console.log('gif2', gif);
+
 			// Add error handler
 			gif.on('error' as string, (error: unknown) => {
 				console.error('GIF generation error:', error);
@@ -432,8 +439,11 @@
 				startAnimation();
 			});
 
+			console.log('gif3', gif);
+
 			// Event handlers
 			gif.on('progress', (p: number) => {
+				console.log('p', p);
 				// Remaining 20% of progress is for rendering
 				gifProgress = 0.8 + p * 0.2;
 				// Update display progress less frequently to avoid rendering issues
@@ -442,7 +452,10 @@
 				}
 			});
 
+			console.log('gif4', gif);
+
 			gif.on('finished', (blob: Blob) => {
+				console.log('finished');
 				// Create download link
 				const url = URL.createObjectURL(blob);
 				const link = document.createElement('a');
@@ -464,6 +477,8 @@
 				// Restart the animation preview
 				startAnimation();
 			});
+
+			console.log('gif5', gif);
 
 			// Start rendering the GIF
 			gif.render();
