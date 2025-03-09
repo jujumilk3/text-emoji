@@ -27,6 +27,13 @@ export interface EmojiTemplate {
 	textGlow?: boolean;
 	textGlowColor?: string;
 	textGlowBlur?: number;
+	// Animation properties
+	animationEnabled?: boolean;
+	animationType?: string;
+	animationSpeed?: number;
+	animationDelay?: number;
+	animationLoop?: boolean;
+	animationDirection?: string;
 }
 
 export interface SavedEmoji extends EmojiTemplate {

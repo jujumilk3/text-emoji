@@ -17,7 +17,7 @@
 					<h2>What is this?</h2>
 					<p>
 						Text Emoji Generator is a free tool that allows you to create custom text-based emojis
-						for Slack. It's inspired by <a
+						for Slack and Discord. It's inspired by <a
 							href="https://emoji-gen.ninja/en/"
 							target="_blank"
 							rel="noopener noreferrer">emoji-gen.ninja</a
@@ -39,9 +39,31 @@
 						<li>Custom text and background colors</li>
 						<li>Gradient background option</li>
 						<li>Size and position controls</li>
+						<li>Text effects (shadow, border, glow)</li>
+						<li>Animation effects (slide, fade, bounce, rotate)</li>
 						<li>Real-time preview in different sizes</li>
 						<li>One-click download</li>
+						<li>Copy to clipboard functionality</li>
+						<li>Save recent emojis</li>
 					</ul>
+
+					<h2>Animation Support</h2>
+					<p>
+						Our emoji generator now supports animated emojis! You can add various animation effects
+						to your text:
+					</p>
+					<ul>
+						<li>Slide animations (left-to-right, right-to-left, top-to-bottom, bottom-to-top)</li>
+						<li>Fade in/out effects</li>
+						<li>Pulse/throb animations</li>
+						<li>Rotation effects</li>
+						<li>Bounce animations</li>
+					</ul>
+					<p>
+						You can customize animation speed, delay, and looping behavior. When you download an
+						animated emoji, it will be saved as an animated PNG that you can use in supported
+						platforms.
+					</p>
 
 					<h2>How to add custom emojis to Slack</h2>
 					<ol>

@@ -23,7 +23,14 @@
 		textBorderWidth = $bindable(2),
 		textGlow = $bindable(false),
 		textGlowColor = $bindable('#ff9900'),
-		textGlowBlur = $bindable(10)
+		textGlowBlur = $bindable(10),
+		// Animation properties
+		animationEnabled = $bindable(false),
+		animationType = $bindable('none'),
+		animationSpeed = $bindable(1000),
+		animationDelay = $bindable(0),
+		animationLoop = $bindable(true),
+		animationDirection = $bindable('normal')
 	} = $props();
 
 	let canvas = $state<HTMLCanvasElement | null>(null);
@@ -31,6 +38,8 @@
 	let smallPreviewSize = 32;
 	let copySuccess = $state(false);
 	let copyTimeout: ReturnType<typeof setTimeout>;
+	let animationFrame: number | null = $state(null);
+	let animationStartTime: number | null = $state(null);
 
 	// Track changes to trigger rendering
 	let renderKey = $state(0);
@@ -79,11 +88,24 @@
 			textGlow,
 			textGlowColor,
 			textGlowBlur,
+			animationEnabled,
+			animationType,
+			animationSpeed,
+			animationDelay,
+			animationLoop,
+			animationDirection,
 			renderKey
 		];
 
 		if (canvas) {
-			renderEmoji();
+			// If animation is enabled, start animation loop
+			if (animationEnabled && animationType !== 'none') {
+				startAnimation();
+			} else {
+				// Otherwise, just render once
+				stopAnimation();
+				renderEmoji();
+			}
 		}
 	});
 
@@ -93,10 +115,78 @@
 		const cleanup = setupKeyListeners();
 
 		// Return cleanup function for onMount
-		return cleanup;
+		return () => {
+			cleanup();
+			stopAnimation();
+		};
 	});
 
-	function renderEmoji() {
+	function startAnimation() {
+		// Stop any existing animation
+		stopAnimation();
+
+		// Reset animation start time
+		animationStartTime = null;
+
+		// Start animation loop
+		animateEmoji();
+	}
+
+	function stopAnimation() {
+		// Cancel any existing animation frame
+		if (animationFrame !== null) {
+			cancelAnimationFrame(animationFrame);
+			animationFrame = null;
+		}
+	}
+
+	function animateEmoji(timestamp?: number) {
+		if (!animationEnabled || animationType === 'none') {
+			renderEmoji();
+			return;
+		}
+
+		// Initialize start time on first frame
+		if (animationStartTime === null) {
+			animationStartTime = timestamp || performance.now();
+		}
+
+		// Calculate elapsed time
+		const elapsedTime = (timestamp || performance.now()) - (animationStartTime || 0);
+
+		// Apply delay before starting animation
+		if (elapsedTime < animationDelay) {
+			animationFrame = requestAnimationFrame(animateEmoji);
+			return;
+		}
+
+		// Calculate animation progress (0 to 1)
+		const effectiveElapsedTime = elapsedTime - animationDelay;
+		let progress = (effectiveElapsedTime % animationSpeed) / animationSpeed;
+
+		// Apply direction
+		if (animationDirection === 'reverse') {
+			progress = 1 - progress;
+		} else if (animationDirection === 'alternate') {
+			const cycle = Math.floor(effectiveElapsedTime / animationSpeed);
+			if (cycle % 2 === 1) {
+				progress = 1 - progress;
+			}
+		}
+
+		// Render frame with animation progress
+		renderAnimationFrame(progress);
+
+		// Continue animation loop if looping is enabled
+		if (animationLoop || effectiveElapsedTime < animationSpeed) {
+			animationFrame = requestAnimationFrame(animateEmoji);
+		} else {
+			// Render final frame if not looping
+			renderAnimationFrame(animationDirection === 'reverse' ? 0 : 1);
+		}
+	}
+
+	function renderAnimationFrame(progress: number) {
 		if (!canvas) return;
 
 		const ctx = canvas.getContext('2d');
@@ -124,22 +214,82 @@
 		ctx.textBaseline =
 			verticalAlign === 'middle' ? 'middle' : verticalAlign === 'bottom' ? 'bottom' : 'top';
 
-		// Calculate text position
-		const x =
+		// Calculate base text position
+		const baseX =
 			horizontalAlign === 'center'
 				? previewSize / 2
 				: horizontalAlign === 'right'
 					? previewSize - padding
 					: padding;
-		const y =
+		const baseY =
 			verticalAlign === 'middle'
 				? previewSize / 2
 				: verticalAlign === 'bottom'
 					? previewSize - padding
 					: padding;
 
+		// Apply animation transformations
+		let x = baseX;
+		let y = baseY;
+		let alpha = 1;
+		let scale = 1;
+		let rotation = 0;
+		let translateX = 0;
+		let translateY = 0;
+
+		// Apply different animations based on type
+		if (animationEnabled && animationType !== 'none') {
+			switch (animationType) {
+				case 'slide-left-to-right':
+					translateX = (progress - 0.5) * previewSize;
+					break;
+				case 'slide-right-to-left':
+					translateX = (0.5 - progress) * previewSize;
+					break;
+				case 'slide-top-to-bottom':
+					translateY = (progress - 0.5) * previewSize;
+					break;
+				case 'slide-bottom-to-top':
+					translateY = (0.5 - progress) * previewSize;
+					break;
+				case 'fade-in-out':
+					// Fade in for first half, fade out for second half
+					alpha = progress < 0.5 ? progress * 2 : 2 - progress * 2;
+					break;
+				case 'pulse':
+					// Scale between 0.8 and 1.2
+					scale = 0.8 + 0.4 * Math.sin(progress * Math.PI * 2);
+					break;
+				case 'rotate':
+					// Rotate 360 degrees
+					rotation = progress * Math.PI * 2;
+					break;
+				case 'bounce':
+					// Simple bounce effect
+					translateY = -Math.abs(Math.sin(progress * Math.PI)) * 20;
+					break;
+			}
+		}
+
+		// Apply transformations
+		x += translateX;
+		y += translateY;
+
 		// Set font
-		ctx.font = `${fontSize}px ${font}`;
+		ctx.font = `${fontSize * scale}px ${font}`;
+
+		// Save context for transformations
+		ctx.save();
+
+		// Apply rotation if needed
+		if (rotation !== 0) {
+			ctx.translate(baseX, baseY);
+			ctx.rotate(rotation);
+			ctx.translate(-baseX, -baseY);
+		}
+
+		// Apply alpha
+		ctx.globalAlpha = alpha;
 
 		// Apply text effects
 		if (textGlow) {
@@ -150,7 +300,7 @@
 			ctx.shadowOffsetX = 0;
 			ctx.shadowOffsetY = 0;
 			ctx.fillStyle = textGlowColor;
-			ctx.globalAlpha = 0.7;
+			ctx.globalAlpha = 0.7 * alpha;
 			ctx.fillText(text, x, y);
 			ctx.restore();
 		}
@@ -179,6 +329,19 @@
 		// Draw main text
 		ctx.fillStyle = textColor;
 		ctx.fillText(text, x, y);
+
+		// Restore context
+		ctx.restore();
+	}
+
+	function renderEmoji() {
+		if (animationEnabled && animationType !== 'none') {
+			// For static rendering, use a neutral animation position
+			renderAnimationFrame(0.5);
+		} else {
+			// Render without animation
+			renderAnimationFrame(0);
+		}
 	}
 
 	function createGradient(ctx: CanvasRenderingContext2D) {
@@ -252,6 +415,8 @@
 	// Function to get current emoji data for saving
 	export function getEmojiData() {
 		return {
+			id: '', // This will be generated by the RecentEmojis component
+			name: `Emoji-${new Date().toISOString().slice(0, 10)}`, // Add a default name
 			text,
 			font,
 			textColor,
@@ -274,6 +439,12 @@
 			textGlow,
 			textGlowColor,
 			textGlowBlur,
+			animationEnabled,
+			animationType,
+			animationSpeed,
+			animationDelay,
+			animationLoop,
+			animationDirection,
 			imageData: canvas?.toDataURL('image/png')
 		};
 	}

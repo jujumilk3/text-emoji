@@ -7,6 +7,7 @@
 	import TextEffects from '$lib/components/TextEffects.svelte';
 	import PresetTemplates from '$lib/components/PresetTemplates.svelte';
 	import RecentEmojis from '$lib/components/RecentEmojis.svelte';
+	import AnimationControls from '$lib/components/AnimationControls.svelte';
 	import type { EmojiTemplate, SavedEmoji } from '$lib/types/emoji';
 
 	// Emoji state
@@ -36,6 +37,14 @@
 	let textGlow = $state(false);
 	let textGlowColor = $state('#ff9900');
 	let textGlowBlur = $state(10);
+
+	// Animation state
+	let animationEnabled = $state(false);
+	let animationType = $state('none');
+	let animationSpeed = $state(1000);
+	let animationDelay = $state(0);
+	let animationLoop = $state(true);
+	let animationDirection = $state('normal');
 
 	// References to components
 	let emojiPreviewComponent: EmojiPreview;
@@ -80,6 +89,16 @@
 		if (template.textGlow) {
 			textGlowColor = template.textGlowColor || textGlowColor;
 			textGlowBlur = template.textGlowBlur || textGlowBlur;
+		}
+
+		// Update animation if present in template
+		animationEnabled = template.animationEnabled || false;
+		if (template.animationEnabled) {
+			animationType = template.animationType || animationType;
+			animationSpeed = template.animationSpeed || animationSpeed;
+			animationDelay = template.animationDelay || animationDelay;
+			animationLoop = template.animationLoop || animationLoop;
+			animationDirection = template.animationDirection || animationDirection;
 		}
 
 		// Force render the preview after applying template
@@ -127,6 +146,16 @@
 		if (emoji.textGlow) {
 			textGlowColor = emoji.textGlowColor || textGlowColor;
 			textGlowBlur = emoji.textGlowBlur || textGlowBlur;
+		}
+
+		// Update animation if present
+		animationEnabled = emoji.animationEnabled || false;
+		if (emoji.animationEnabled) {
+			animationType = emoji.animationType || animationType;
+			animationSpeed = emoji.animationSpeed || animationSpeed;
+			animationDelay = emoji.animationDelay || animationDelay;
+			animationLoop = emoji.animationLoop || animationLoop;
+			animationDirection = emoji.animationDirection || animationDirection;
 		}
 
 		// Force render the preview after applying saved emoji
@@ -196,6 +225,17 @@
 					</div>
 
 					<div class="overflow-hidden rounded-lg bg-white p-6 shadow">
+						<AnimationControls
+							bind:animationEnabled
+							bind:animationType
+							bind:animationSpeed
+							bind:animationDelay
+							bind:animationLoop
+							bind:animationDirection
+						/>
+					</div>
+
+					<div class="overflow-hidden rounded-lg bg-white p-6 shadow">
 						<PresetTemplates on:select={handleTemplateSelect} />
 					</div>
 				</div>
@@ -227,6 +267,12 @@
 						{textGlow}
 						{textGlowColor}
 						{textGlowBlur}
+						{animationEnabled}
+						{animationType}
+						{animationSpeed}
+						{animationDelay}
+						{animationLoop}
+						{animationDirection}
 					/>
 
 					<div class="flex justify-center">
