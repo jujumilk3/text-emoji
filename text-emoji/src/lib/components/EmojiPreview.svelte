@@ -39,8 +39,8 @@
 	let smallPreviewSize = 32;
 	let copySuccess = $state(false);
 	let copyTimeout: ReturnType<typeof setTimeout>;
-	let animationFrame: number | null = $state(null);
-	let animationStartTime: number | null = $state(null);
+	let animationFrame: number;
+	let animationStartTime: number;
 	let isGeneratingGif = $state(false);
 	let gifProgress = 0;
 	let displayGifProgress = $state(0);
@@ -107,6 +107,7 @@
 			if (animationEnabled && animationType !== 'none') {
 				startAnimation();
 			} else {
+				console.log('$effect, else');
 				// Otherwise, just render once
 				stopAnimation();
 				renderEmoji();
@@ -128,7 +129,7 @@
 
 	function startAnimation() {
 		// Stop any existing animation
-		stopAnimation();
+		// stopAnimation();
 
 		// Reset animation start time
 		animationStartTime = null;
@@ -138,6 +139,8 @@
 	}
 
 	function stopAnimation() {
+		console.log('stopAnimation');
+		console.log('animationFrame', animationFrame);
 		// Cancel any existing animation frame
 		if (animationFrame !== null) {
 			cancelAnimationFrame(animationFrame);
@@ -382,6 +385,7 @@
 	}
 
 	function createAndDownloadGif() {
+		console.log('createAndDownloadGif');
 		if (!canvas) return;
 
 		try {
