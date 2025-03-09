@@ -71,6 +71,11 @@
 	let gifProgress = 0;
 	let displayGifProgress = $state(0);
 
+	// For sliding text animation
+	let slidingTextCanvas = $state<HTMLCanvasElement | null>(null);
+	let slidingTextWidth = $state(0);
+	let slidingTextPadding = 128; // Padding for sliding text animation
+
 	// Track changes to trigger rendering
 	let renderKey = $state(0);
 
@@ -131,6 +136,10 @@
 		if (canvas) {
 			// If animation is enabled, start animation loop
 			if (animationEnabled && animationType !== 'none') {
+				// For sliding text animation, prepare the sliding text canvas
+				if (animationType === 'sliding-text') {
+					prepareSlidingTextCanvas();
+				}
 				startAnimation();
 			} else {
 				console.log('$effect, else');
@@ -154,6 +163,103 @@
 			stopAnimation();
 		};
 	});
+
+	// Prepare the sliding text canvas with the text rendered across it
+	function prepareSlidingTextCanvas() {
+		// Create a temporary canvas for measuring text width
+		const tempCanvas = document.createElement('canvas');
+		const tempCtx = tempCanvas.getContext('2d');
+		if (!tempCtx) return;
+
+		// Set font to measure text width
+		tempCtx.font = `${fontSize}px ${font}`;
+		const textMetrics = tempCtx.measureText(text);
+
+		// Calculate total width needed for sliding text
+		// Add extra padding on both sides
+		slidingTextWidth = Math.ceil(textMetrics.width) + slidingTextPadding * 2;
+
+		// Create or resize the sliding text canvas
+		if (!slidingTextCanvas) {
+			slidingTextCanvas = document.createElement('canvas');
+		}
+		slidingTextCanvas.width = slidingTextWidth;
+		slidingTextCanvas.height = previewSize;
+
+		const ctx = slidingTextCanvas.getContext('2d');
+		if (!ctx) return;
+
+		// Clear canvas
+		ctx.clearRect(0, 0, slidingTextWidth, previewSize);
+
+		// Draw background
+		if (showGradient) {
+			const gradient = createSlidingGradient(ctx);
+			ctx.fillStyle = gradient;
+		} else {
+			ctx.fillStyle = backgroundColor;
+		}
+		ctx.fillRect(0, 0, slidingTextWidth, previewSize);
+
+		// Set text properties
+		ctx.font = `${fontSize}px ${font}`;
+		ctx.textAlign = 'center';
+		ctx.textBaseline = 'middle';
+
+		// Apply text effects
+		if (textGlow) {
+			ctx.save();
+			ctx.shadowColor = textGlowColor;
+			ctx.shadowBlur = textGlowBlur;
+			ctx.shadowOffsetX = 0;
+			ctx.shadowOffsetY = 0;
+			ctx.fillStyle = textGlowColor;
+			ctx.globalAlpha = 0.7;
+			ctx.fillText(text, slidingTextWidth / 2, previewSize / 2);
+			ctx.restore();
+		}
+
+		if (textShadow) {
+			ctx.save();
+			ctx.fillStyle = textShadowColor;
+			ctx.shadowColor = textShadowColor;
+			ctx.shadowBlur = textShadowBlur;
+			ctx.shadowOffsetX = textShadowOffsetX;
+			ctx.shadowOffsetY = textShadowOffsetY;
+			ctx.fillText(text, slidingTextWidth / 2, previewSize / 2);
+			ctx.restore();
+		}
+
+		if (textBorder) {
+			ctx.save();
+			ctx.strokeStyle = textBorderColor;
+			ctx.lineWidth = textBorderWidth;
+			ctx.strokeText(text, slidingTextWidth / 2, previewSize / 2);
+			ctx.restore();
+		}
+
+		// Draw main text
+		ctx.fillStyle = textColor;
+		ctx.fillText(text, slidingTextWidth / 2, previewSize / 2);
+	}
+
+	// Create gradient for sliding text canvas
+	function createSlidingGradient(ctx: CanvasRenderingContext2D) {
+		let gradient;
+
+		if (gradientDirection === 'to-right') {
+			gradient = ctx.createLinearGradient(0, 0, slidingTextWidth, 0);
+		} else if (gradientDirection === 'to-bottom') {
+			gradient = ctx.createLinearGradient(0, 0, 0, previewSize);
+		} else {
+			gradient = ctx.createLinearGradient(0, 0, slidingTextWidth, previewSize);
+		}
+
+		gradient.addColorStop(0, backgroundColor);
+		gradient.addColorStop(1, gradientColor);
+
+		return gradient;
+	}
 
 	function startAnimation() {
 		// Stop any existing animation
@@ -242,6 +348,52 @@
 
 		// Clear canvas
 		ctx.clearRect(0, 0, previewSize, previewSize);
+
+		// Special handling for sliding text animation
+		if (animationType === 'sliding-text' && slidingTextCanvas) {
+			// Draw background
+			if (showGradient) {
+				const gradient = createGradient(ctx);
+				ctx.fillStyle = gradient;
+			} else {
+				ctx.fillStyle = backgroundColor;
+			}
+			ctx.fillRect(0, 0, previewSize, previewSize);
+
+			// Calculate the offset for sliding text
+			// The text should move from right to left (or left to right if reversed)
+			const totalMovement = slidingTextWidth - previewSize;
+			let offset;
+
+			if (animationDirection === 'reverse') {
+				// Right to left
+				offset = progress * totalMovement;
+			} else if (animationDirection === 'alternate') {
+				// Alternate between directions
+				const cycle = Math.floor(progress * 2);
+				const cycleProgress = (progress * 2) % 1;
+				offset =
+					cycle % 2 === 0 ? cycleProgress * totalMovement : (1 - cycleProgress) * totalMovement;
+			} else {
+				// Left to right (normal)
+				offset = (1 - progress) * totalMovement;
+			}
+
+			// Draw the portion of the sliding text canvas that should be visible
+			ctx.drawImage(
+				slidingTextCanvas,
+				offset,
+				0,
+				previewSize,
+				previewSize,
+				0,
+				0,
+				previewSize,
+				previewSize
+			);
+
+			return;
+		}
 
 		// Draw background
 		if (showGradient) {
@@ -490,7 +642,7 @@
 			let frameGenerationMethod;
 
 			// 특정 애니메이션 유형에 대해 더 많은 프레임 생성
-			const needsMoreFrames = ['rotate', 'bounce', 'pulse'].includes(animationType);
+			const needsMoreFrames = ['rotate', 'bounce', 'pulse', 'sliding-text'].includes(animationType);
 			const actualFramesCount = needsMoreFrames ? framesCount * 1.5 : framesCount;
 
 			// Add frames to the GIF
@@ -513,7 +665,7 @@
 						progress = rawProgress;
 					}
 					// 슬라이드 애니메이션은 약간의 가속/감속 적용
-					else if (animationType.startsWith('slide-')) {
+					else if (animationType.startsWith('slide-') || animationType === 'sliding-text') {
 						// 이징 함수로 가속/감속 효과
 						progress = 0.5 - 0.5 * Math.cos(rawProgress * Math.PI);
 					}

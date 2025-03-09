@@ -15,7 +15,7 @@
 	let font = $state('sans-serif');
 	let textColor = $state('#000000');
 	let backgroundColor = $state('#ffffff');
-	let fontSize = $state(32);
+	let fontSize = $state(72);
 	let padding = $state(10);
 	let horizontalAlign = $state('center');
 	let verticalAlign = $state('middle');
@@ -186,7 +186,7 @@
 			<div class="sm:col-span-4">
 				<div class="space-y-6">
 					<div class="overflow-hidden rounded-lg bg-white p-6 shadow">
-						<TextInput bind:value={text} maxLength={10} />
+						<TextInput bind:value={text} maxLength={20} />
 					</div>
 
 					<div class="overflow-hidden rounded-lg bg-white p-6 shadow">

@@ -30,7 +30,7 @@
 				id="font-size"
 				type="range"
 				min="12"
-				max="72"
+				max="200"
 				bind:value={fontSize}
 				class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
 			/>

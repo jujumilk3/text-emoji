@@ -12,6 +12,7 @@
 	// Animation type options
 	const animationTypes = [
 		{ value: 'none', label: 'None' },
+		{ value: 'sliding-text', label: 'Scrolling' },
 		{ value: 'slide-left-to-right', label: 'Slide Left to Right' },
 		{ value: 'slide-right-to-left', label: 'Slide Right to Left' },
 		{ value: 'slide-top-to-bottom', label: 'Slide Top to Bottom' },
