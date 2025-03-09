@@ -55,10 +55,10 @@
 		animationDirection = $bindable('normal')
 	} = $props();
 
-	// GIF 생성 관련 설정
-	let gifQuality = $state(1); // 1-20, 낮을수록 품질 좋음
-	let gifFrameCount = $state(60); // 기본 프레임 수
-	let gifSmoothing = $state(true); // 프레임 간 부드러운 전환 활성화
+	// GIF generation settings
+	let gifQuality = $state(1); // 1-20, lower is better quality
+	let gifFrameCount = $state(60); // Default frame count
+	let gifSmoothing = $state(true); // Enable smooth transition between frames
 
 	let canvas = $state<HTMLCanvasElement | null>(null);
 	let previewSize = 128;
@@ -222,10 +222,10 @@
 		}
 	}
 
-	// 보간(interpolation) 함수 추가
+	// Add interpolation function
 	function interpolate(start: number, end: number, progress: number): number {
-		// 이징(easing) 함수 적용 - 부드러운 시작과 끝
-		// 사인 이징 함수 사용
+		// Apply easing function - smooth start and end
+		// Using sine easing function
 		const easedProgress = 0.5 - 0.5 * Math.cos(progress * Math.PI);
 		return start + (end - start) * easedProgress;
 	}
@@ -283,7 +283,7 @@
 
 		// Apply different animations based on type
 		if (animationEnabled && animationType !== 'none') {
-			// 부드러운 애니메이션을 위한 이징 적용
+			// Apply easing for smooth animation
 			const easedProgress = 0.5 - 0.5 * Math.cos(progress * Math.PI * 2);
 
 			switch (animationType) {
@@ -300,27 +300,27 @@
 					translateY = interpolate(previewSize / 2, -previewSize / 2, progress);
 					break;
 				case 'fade-in-out':
-					// 부드러운 페이드 인/아웃
+					// Smooth fade in/out
 					alpha =
 						progress < 0.5
 							? interpolate(0, 1, progress * 2)
 							: interpolate(1, 0, (progress - 0.5) * 2);
 					break;
 				case 'pulse':
-					// 부드러운 펄스 효과
+					// Smooth pulse effect
 					scale = interpolate(0.8, 1.2, easedProgress);
 					break;
 				case 'rotate':
-					// 부드러운 회전
+					// Smooth rotation
 					rotation = progress * Math.PI * 2;
 					break;
 				case 'bounce':
-					// 부드러운 바운스 효과
+					// Smooth bounce effect
 					translateY = -Math.abs(Math.sin(progress * Math.PI)) * 20;
-					// 바운스 정점에서 약간 멈추는 효과 추가
+					// Add slight pause effect at the bounce peak
 					if (progress > 0.4 && progress < 0.6) {
-						const peakFactor = 1 - Math.abs((progress - 0.5) * 10); // 0.5에 가까울수록 1에 가까움
-						translateY *= 1 + peakFactor * 0.2; // 정점에서 약간 더 높게
+						const peakFactor = 1 - Math.abs((progress - 0.5) * 10); // Closer to 0.5, closer to 1
+						translateY *= 1 + peakFactor * 0.2; // Slightly higher at the peak
 					}
 					break;
 			}
@@ -734,12 +734,12 @@
 
 	{#if animationEnabled && animationType !== 'none'}
 		<div class="rounded-md border bg-white p-4">
-			<h3 class="mb-4 text-lg font-medium text-gray-900">GIF 품질 설정</h3>
+			<h3 class="mb-4 text-lg font-medium text-gray-900">GIF Quality Settings</h3>
 
 			<div class="space-y-4">
 				<div>
 					<label for="gif-quality" class="block text-sm font-medium text-gray-700">
-						GIF 품질 (낮을수록 고품질, 파일 크기 증가)
+						GIF Quality (lower is better quality, larger file size)
 					</label>
 					<input
 						type="range"
@@ -751,15 +751,15 @@
 						class="mt-1 block w-full rounded-md border-gray-300"
 					/>
 					<div class="mt-1 flex justify-between text-xs text-gray-500">
-						<span>고품질</span>
-						<span>현재: {gifQuality}</span>
-						<span>저품질</span>
+						<span>High Quality</span>
+						<span>Current: {gifQuality}</span>
+						<span>Low Quality</span>
 					</div>
 				</div>
 
 				<div>
 					<label for="gif-frames" class="block text-sm font-medium text-gray-700">
-						프레임 수 (높을수록 부드러움, 파일 크기 증가)
+						Frame Count (higher is smoother, larger file size)
 					</label>
 					<input
 						type="range"
@@ -771,9 +771,9 @@
 						class="mt-1 block w-full rounded-md border-gray-300"
 					/>
 					<div class="mt-1 flex justify-between text-xs text-gray-500">
-						<span>적음</span>
-						<span>현재: {gifFrameCount}프레임</span>
-						<span>많음</span>
+						<span>Few</span>
+						<span>Current: {gifFrameCount} frames</span>
+						<span>Many</span>
 					</div>
 				</div>
 
@@ -786,7 +786,7 @@
 						class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
 					/>
 					<label for="gif-smoothing" class="ml-2 block text-sm text-gray-900">
-						프레임 간 부드러운 전환 활성화
+						Enable smooth transition between frames
 					</label>
 				</div>
 			</div>
