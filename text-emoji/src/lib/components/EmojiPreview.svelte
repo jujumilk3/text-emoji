@@ -383,81 +383,96 @@
 	function createAndDownloadGif() {
 		if (!canvas) return;
 
-		isGeneratingGif = true;
-		gifProgress = 0;
-		displayGifProgress = 0;
-
-		console.log('Creating GIF');
-
-		// Create a GIF encoder
-		const gif = new GIF({
-			workers: 2,
-			quality: 10,
-			width: previewSize,
-			height: previewSize,
-			workerScript: '/gif.worker.js', // Make sure this path is correct
-			background: backgroundColor
-		});
-
-		// Number of frames to capture for one animation cycle
-		const framesCount = 20; // Adjust for smoother or faster GIF
-
-		// Stop any running animation to control our own rendering
-		stopAnimation();
-
-		// Add frames to the GIF
-		for (let i = 0; i < framesCount; i++) {
-			// Calculate progress for this frame (0 to 1)
-			const progress = i / framesCount;
-
-			// Render the frame at this progress point
-			renderAnimationFrame(progress);
-
-			// Add the current canvas content as a frame
-			gif.addFrame(canvas, { copy: true, delay: animationSpeed / framesCount });
-
-			// Update progress (non-reactive)
-			gifProgress = ((i + 1) / framesCount) * 0.8; // 80% of progress is for frame generation
-			// Update display progress (reactive, but only once per frame)
-			if (i % 5 === 0 || i === framesCount - 1) {
-				displayGifProgress = gifProgress;
-			}
-			console.log(displayGifProgress);
-		}
-
-		// Event handlers
-		gif.on('progress', (p: number) => {
-			console.log('Progress updated');
-			console.log(p);
-			// Remaining 20% of progress is for rendering (non-reactive update)
-			gifProgress = 0.8 + p * 0.2;
-			// Update display progress less frequently to avoid infinite loops
-			if (Math.round(p * 10) % 2 === 0) {
-				displayGifProgress = gifProgress;
-			}
-		});
-
-		gif.on('finished', (blob: Blob) => {
-			console.log('GIF finished');
-			// Create download link
-			const url = URL.createObjectURL(blob);
-			const link = document.createElement('a');
-			link.href = url;
-			link.download = `emoji-${text.replace(/\s+/g, '-')}.gif`;
-			link.click();
-
-			// Clean up
-			URL.revokeObjectURL(url);
-			isGeneratingGif = false;
+		try {
+			isGeneratingGif = true;
 			gifProgress = 0;
 			displayGifProgress = 0;
 
-			// Restart the animation preview
-			startAnimation();
-		});
+			// Create a GIF encoder
+			const gif = new GIF({
+				workers: 2,
+				quality: 10,
+				width: previewSize,
+				height: previewSize,
+				workerScript: '/gif.worker.js', // Worker script is now in the static directory
+				background: backgroundColor
+			});
 
-		// Start rendering the GIF
-		gif.render();
+			// Number of frames to capture for one animation cycle
+			const framesCount = 30; // Increased for smoother animation
+			const frameDelay = Math.max(50, animationSpeed / framesCount); // Ensure minimum delay of 50ms per frame
+
+			// Stop any running animation to control our own rendering
+			stopAnimation();
+
+			// Add frames to the GIF
+			for (let i = 0; i < framesCount; i++) {
+				// Calculate progress for this frame (0 to 1)
+				const progress = i / framesCount;
+
+				// Render the frame at this progress point
+				renderAnimationFrame(progress);
+
+				// Add the current canvas content as a frame
+				gif.addFrame(canvas, { copy: true, delay: frameDelay });
+
+				// Update progress (non-reactive)
+				gifProgress = ((i + 1) / framesCount) * 0.8; // 80% of progress is for frame generation
+				// Update display progress (reactive, but only once per frame)
+				if (i % 5 === 0 || i === framesCount - 1) {
+					displayGifProgress = gifProgress;
+				}
+			}
+
+			// Add error handler
+			gif.on('error' as string, (error: unknown) => {
+				console.error('GIF generation error:', error);
+				alert('Error generating GIF: ' + (error instanceof Error ? error.message : String(error)));
+				isGeneratingGif = false;
+				startAnimation();
+			});
+
+			// Event handlers
+			gif.on('progress', (p: number) => {
+				// Remaining 20% of progress is for rendering
+				gifProgress = 0.8 + p * 0.2;
+				// Update display progress less frequently to avoid rendering issues
+				if (Math.round(p * 10) % 2 === 0) {
+					displayGifProgress = gifProgress;
+				}
+			});
+
+			gif.on('finished', (blob: Blob) => {
+				// Create download link
+				const url = URL.createObjectURL(blob);
+				const link = document.createElement('a');
+				link.href = url;
+				link.download = `emoji-${text.replace(/\s+/g, '-')}.gif`;
+				document.body.appendChild(link); // Append to body to ensure it works in all browsers
+				link.click();
+				document.body.removeChild(link); // Clean up
+
+				// Clean up
+				setTimeout(() => {
+					URL.revokeObjectURL(url);
+				}, 100); // Small delay to ensure download starts before revoking
+
+				isGeneratingGif = false;
+				gifProgress = 0;
+				displayGifProgress = 0;
+
+				// Restart the animation preview
+				startAnimation();
+			});
+
+			// Start rendering the GIF
+			gif.render();
+		} catch (error) {
+			console.error('Error setting up GIF generation:', error);
+			alert('Failed to generate GIF: ' + (error instanceof Error ? error.message : String(error)));
+			isGeneratingGif = false;
+			startAnimation();
+		}
 	}
 
 	async function copyToClipboard() {
@@ -597,6 +612,9 @@
 			onclick={downloadEmoji}
 			class="focus:ring-primary-500 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2"
 			disabled={isGeneratingGif}
+			title={animationEnabled && animationType !== 'none'
+				? 'Download as animated GIF'
+				: 'Download as PNG image'}
 		>
 			{#if isGeneratingGif}
 				<svg class="mr-2 h-4 w-4 animate-spin" viewBox="0 0 24 24">
@@ -617,6 +635,18 @@
 				</svg>
 				Generating GIF ({Math.round(displayGifProgress * 100)}%)
 			{:else}
+				<svg
+					class="mr-2 h-4 w-4"
+					xmlns="http://www.w3.org/2000/svg"
+					viewBox="0 0 20 20"
+					fill="currentColor"
+				>
+					<path
+						fill-rule="evenodd"
+						d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+						clip-rule="evenodd"
+					/>
+				</svg>
 				Download {animationEnabled && animationType !== 'none' ? 'GIF' : 'PNG'}
 			{/if}
 		</button>
