@@ -29,11 +29,26 @@
 						class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-none rounded-l-md border-gray-300 sm:text-sm"
 					/>
 				</div>
-				<input
-					type="color"
-					bind:value={textColor}
-					class="-ml-px inline-flex w-12 items-center rounded-r-md border border-gray-300 bg-gray-50 px-3 py-2"
-				/>
+				<div class="relative">
+					<input
+						type="color"
+						bind:value={textColor}
+						id="text-color-picker"
+						class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+					/>
+					<div
+						class="-ml-px flex h-full w-12 items-center justify-center rounded-r-md border border-gray-300 bg-gray-50 px-3 py-2"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 24 24"
+							fill="currentColor"
+							class="h-5 w-5 text-gray-500"
+						>
+							<path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5Z" />
+						</svg>
+					</div>
+				</div>
 			</div>
 		</div>
 
@@ -51,11 +66,26 @@
 						class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-none rounded-l-md border-gray-300 sm:text-sm"
 					/>
 				</div>
-				<input
-					type="color"
-					bind:value={backgroundColor}
-					class="-ml-px inline-flex w-12 items-center rounded-r-md border border-gray-300 bg-gray-50 px-3 py-2"
-				/>
+				<div class="relative">
+					<input
+						type="color"
+						bind:value={backgroundColor}
+						id="background-color-picker"
+						class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+					/>
+					<div
+						class="-ml-px flex h-full w-12 items-center justify-center rounded-r-md border border-gray-300 bg-gray-50 px-3 py-2"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 24 24"
+							fill="currentColor"
+							class="h-5 w-5 text-gray-500"
+						>
+							<path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5Z" />
+						</svg>
+					</div>
+				</div>
 			</div>
 		</div>
 
@@ -89,11 +119,26 @@
 									class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-none rounded-l-md border-gray-300 sm:text-sm"
 								/>
 							</div>
-							<input
-								type="color"
-								bind:value={gradientColor}
-								class="-ml-px inline-flex w-12 items-center rounded-r-md border border-gray-300 bg-gray-50 px-3 py-2"
-							/>
+							<div class="relative">
+								<input
+									type="color"
+									bind:value={gradientColor}
+									id="gradient-color-picker"
+									class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+								/>
+								<div
+									class="-ml-px flex h-full w-12 items-center justify-center rounded-r-md border border-gray-300 bg-gray-50 px-3 py-2"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 24 24"
+										fill="currentColor"
+										class="h-5 w-5 text-gray-500"
+									>
+										<path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5Z" />
+									</svg>
+								</div>
+							</div>
 						</div>
 					</div>
 
