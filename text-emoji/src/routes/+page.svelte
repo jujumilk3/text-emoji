@@ -36,7 +36,31 @@
 		textGlowBlur?: number;
 	}
 
-	interface SavedEmoji extends EmojiTemplate {
+	// Update SavedEmoji interface to match the one in RecentEmojis.svelte
+	interface SavedEmoji {
+		id: string;
+		text: string;
+		font: string;
+		textColor: string;
+		backgroundColor: string;
+		fontSize: number;
+		padding: number;
+		horizontalAlign: string;
+		verticalAlign: string;
+		showGradient: boolean;
+		gradientColor?: string;
+		gradientDirection?: string;
+		textShadow?: boolean;
+		textShadowColor?: string;
+		textShadowBlur?: number;
+		textShadowOffsetX?: number;
+		textShadowOffsetY?: number;
+		textBorder?: boolean;
+		textBorderColor?: string;
+		textBorderWidth?: number;
+		textGlow?: boolean;
+		textGlowColor?: string;
+		textGlowBlur?: number;
 		timestamp: number;
 		imageData?: string;
 	}
@@ -113,6 +137,11 @@
 			textGlowColor = template.textGlowColor || textGlowColor;
 			textGlowBlur = template.textGlowBlur || textGlowBlur;
 		}
+
+		// Force render the preview after applying template
+		if (emojiPreviewComponent) {
+			emojiPreviewComponent.forceRender();
+		}
 	}
 
 	// Handle recent emoji selection
@@ -154,6 +183,11 @@
 		if (emoji.textGlow) {
 			textGlowColor = emoji.textGlowColor || textGlowColor;
 			textGlowBlur = emoji.textGlowBlur || textGlowBlur;
+		}
+
+		// Force render the preview after applying saved emoji
+		if (emojiPreviewComponent) {
+			emojiPreviewComponent.forceRender();
 		}
 	}
 

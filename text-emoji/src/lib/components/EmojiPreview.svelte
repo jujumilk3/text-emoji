@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	const {
+	let {
 		text = $bindable(''),
 		font = $bindable('sans-serif'),
 		textColor = $bindable('#000000'),
@@ -32,34 +32,74 @@
 	let copySuccess = $state(false);
 	let copyTimeout: ReturnType<typeof setTimeout>;
 
-	// Debounce rendering for performance
-	let renderTimeout: ReturnType<typeof setTimeout>;
-	let lastRenderTime = 0;
-	const RENDER_DELAY = 300; // 300ms delay for rendering after text changes
+	// Track changes to trigger rendering
+	let renderKey = $state(0);
 
+	// Listen for document-wide key events to trigger rendering
+	function setupKeyListeners() {
+		const handleKeyEvent = () => {
+			renderKey++;
+			renderEmoji();
+		};
+
+		// Add event listeners for key events
+		window.addEventListener('keyup', handleKeyEvent);
+		window.addEventListener('keydown', handleKeyEvent);
+
+		// Return cleanup function
+		return () => {
+			window.removeEventListener('keyup', handleKeyEvent);
+			window.removeEventListener('keydown', handleKeyEvent);
+		};
+	}
+
+	// Watch for changes in all properties to trigger rendering
 	$effect(() => {
+		// Create a dependency on all properties that should trigger a render
+		const _ = [
+			text,
+			font,
+			textColor,
+			backgroundColor,
+			fontSize,
+			padding,
+			horizontalAlign,
+			verticalAlign,
+			showGradient,
+			gradientColor,
+			gradientDirection,
+			textShadow,
+			textShadowColor,
+			textShadowBlur,
+			textShadowOffsetX,
+			textShadowOffsetY,
+			textBorder,
+			textBorderColor,
+			textBorderWidth,
+			textGlow,
+			textGlowColor,
+			textGlowBlur,
+			renderKey
+		];
+
 		if (canvas) {
-			// Debounce rendering
-			clearTimeout(renderTimeout);
-			const now = Date.now();
-			if (now - lastRenderTime > RENDER_DELAY) {
-				renderEmoji();
-				lastRenderTime = now;
-			} else {
-				renderTimeout = setTimeout(() => {
-					renderEmoji();
-					lastRenderTime = Date.now();
-				}, RENDER_DELAY);
-			}
+			renderEmoji();
 		}
 	});
 
 	onMount(() => {
 		renderEmoji();
+		// Setup key listeners and store cleanup function
+		const cleanup = setupKeyListeners();
+
+		// Return cleanup function for onMount
+		return cleanup;
 	});
 
 	function renderEmoji() {
-		const ctx = canvas?.getContext('2d');
+		if (!canvas) return;
+
+		const ctx = canvas.getContext('2d');
 		if (!ctx) return;
 
 		// Set canvas dimensions
@@ -173,6 +213,8 @@
 		try {
 			// Convert canvas to blob
 			const blob = await new Promise<Blob>((resolve) => {
+				if (!canvas) return;
+
 				canvas.toBlob((blob) => {
 					if (blob) resolve(blob);
 				}, 'image/png');
@@ -195,11 +237,16 @@
 				copySuccess = false;
 			}, 2000);
 		} catch (error) {
-			console.error('Failed to copy image to clipboard:', error);
 			alert(
 				'Failed to copy image to clipboard. This feature may not be supported in your browser.'
 			);
 		}
+	}
+
+	// Function to manually trigger a render
+	export function forceRender() {
+		renderKey++;
+		renderEmoji();
 	}
 
 	// Function to get current emoji data for saving
