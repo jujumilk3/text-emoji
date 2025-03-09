@@ -7,12 +7,12 @@
 	<header class="bg-white shadow">
 		<div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
 			<h1 class="text-primary-600 text-2xl font-bold">Slack Emoji Generator</h1>
-			<nav>
+			<!-- <nav>
 				<ul class="flex space-x-4">
 					<li><a href="/" class="hover:text-primary-600 text-gray-600">Home</a></li>
 					<li><a href="/about" class="hover:text-primary-600 text-gray-600">About</a></li>
 				</ul>
-			</nav>
+			</nav> -->
 		</div>
 	</header>
 
