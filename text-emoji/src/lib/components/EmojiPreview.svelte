@@ -39,8 +39,8 @@
 	let smallPreviewSize = 32;
 	let copySuccess = $state(false);
 	let copyTimeout: ReturnType<typeof setTimeout>;
-	let animationFrame: number;
-	let animationStartTime: number;
+	let animationFrame: number | null;
+	let animationStartTime: number | null;
 	let isGeneratingGif = $state(false);
 	let gifProgress = 0;
 	let displayGifProgress = $state(0);
