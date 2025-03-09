@@ -14,7 +14,6 @@
 						`Failed to load worker script: ${response.status} ${response.statusText}`
 					);
 				}
-				console.log('GIF worker script found and loaded successfully');
 				workerScriptLoaded = true;
 			})
 			.catch((error) => {
@@ -99,7 +98,6 @@
 
 	// Watch for changes in all properties to trigger rendering
 	$effect(() => {
-		console.log('effect');
 		// Create a dependency on all properties that should trigger a render
 		const _ = [
 			text,
@@ -142,7 +140,6 @@
 				}
 				startAnimation();
 			} else {
-				console.log('$effect, else');
 				// Otherwise, just render once
 				stopAnimation();
 				renderEmoji();
@@ -273,8 +270,6 @@
 	}
 
 	function stopAnimation() {
-		console.log('stopAnimation');
-		console.log('animationFrame', animationFrame);
 		// Cancel any existing animation frame
 		if (animationFrame !== null) {
 			cancelAnimationFrame(animationFrame);
@@ -584,7 +579,6 @@
 	}
 
 	function createAndDownloadGif() {
-		console.log('createAndDownloadGif');
 		if (!canvas) return;
 
 		// Check if worker script is loaded
@@ -623,8 +617,6 @@
 				throw new Error('Failed to initialize GIF encoder properly');
 			}
 
-			console.log('gif created', gif);
-
 			// 사용자 설정 프레임 수 사용
 			const framesCount = gifFrameCount;
 
@@ -632,8 +624,6 @@
 			// 빠른 애니메이션은 더 짧은 딜레이, 느린 애니메이션은 더 긴 딜레이
 			const speedFactor = Math.min(2, Math.max(0.5, 1000 / animationSpeed));
 			const frameDelay = Math.max(20, Math.min(100, 40 / speedFactor));
-
-			console.log(`Animation speed: ${animationSpeed}ms, Frame delay: ${frameDelay}ms`);
 
 			// Stop any running animation to control our own rendering
 			stopAnimation();
@@ -700,8 +690,6 @@
 				}
 			}
 
-			console.log('All frames added');
-
 			// Add error handler
 			gif.on('error' as any, (error: any) => {
 				console.error('GIF generation error:', error);
@@ -710,11 +698,8 @@
 				startAnimation();
 			});
 
-			console.log('Error handler added');
-
 			// Event handlers
 			gif.on('progress' as any, (p: number) => {
-				console.log('GIF progress:', p);
 				// Remaining 20% of progress is for rendering
 				gifProgress = 0.8 + p * 0.2;
 				// Update display progress less frequently to avoid rendering issues
@@ -723,10 +708,7 @@
 				}
 			});
 
-			console.log('Progress handler added');
-
 			gif.on('finished' as any, (blob: Blob) => {
-				console.log('GIF finished!');
 				// Create download link
 				const url = URL.createObjectURL(blob);
 				const link = document.createElement('a');
@@ -749,12 +731,8 @@
 				startAnimation();
 			});
 
-			console.log('Finished handler added');
-
 			// Start rendering the GIF
-			console.log('Starting GIF render');
 			gif.render();
-			console.log('GIF render started');
 		} catch (error) {
 			console.error('Error setting up GIF generation:', error);
 			alert('Failed to generate GIF: ' + (error instanceof Error ? error.message : String(error)));
