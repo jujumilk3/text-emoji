@@ -2,6 +2,27 @@
 	import { onMount } from 'svelte';
 	import GIF from 'gif.js';
 
+	// Preload the GIF worker script
+	let workerScriptLoaded = $state(false);
+
+	function preloadWorkerScript() {
+		// Check if the worker script exists by creating a test request
+		fetch('./gif.worker.js')
+			.then((response) => {
+				if (!response.ok) {
+					throw new Error(
+						`Failed to load worker script: ${response.status} ${response.statusText}`
+					);
+				}
+				console.log('GIF worker script found and loaded successfully');
+				workerScriptLoaded = true;
+			})
+			.catch((error) => {
+				console.error('Error preloading GIF worker script:', error);
+				alert('Warning: GIF worker script could not be loaded. GIF generation may not work.');
+			});
+	}
+
 	let {
 		text = $bindable(''),
 		font = $bindable('sans-serif'),
@@ -117,6 +138,8 @@
 
 	onMount(() => {
 		renderEmoji();
+		// Preload the worker script
+		preloadWorkerScript();
 		// Setup key listeners and store cleanup function
 		const cleanup = setupKeyListeners();
 
@@ -388,10 +411,23 @@
 		console.log('createAndDownloadGif');
 		if (!canvas) return;
 
+		// Check if worker script is loaded
+		if (!workerScriptLoaded) {
+			alert('GIF worker script is not loaded yet. Please try again in a moment.');
+			// Try to load it again
+			preloadWorkerScript();
+			return;
+		}
+
 		try {
 			isGeneratingGif = true;
 			gifProgress = 0;
 			displayGifProgress = 0;
+
+			// Check if GIF constructor is available
+			if (typeof GIF !== 'function') {
+				throw new Error('GIF.js library is not properly loaded');
+			}
 
 			// Create a GIF encoder
 			const gif = new GIF({
@@ -399,22 +435,27 @@
 				quality: 10,
 				width: previewSize,
 				height: previewSize,
-				workerScript: '/gif.worker.js', // Worker script is now in the static directory
+				workerScript: './gif.worker.js', // Fix the path to the worker script
 				background: backgroundColor
 			});
 
-			console.log('gif', gif);
+			// Verify that the GIF object was created properly
+			if (!gif || typeof gif.on !== 'function' || typeof gif.render !== 'function') {
+				throw new Error('Failed to initialize GIF encoder properly');
+			}
+
+			console.log('gif created', gif);
 
 			// Number of frames to capture for one animation cycle
 			const framesCount = 30; // Increased for smoother animation
 			const frameDelay = Math.max(50, animationSpeed / framesCount); // Ensure minimum delay of 50ms per frame
 
 			// Stop any running animation to control our own rendering
-			// stopAnimation();
+			stopAnimation();
 
 			// Add frames to the GIF
 			for (let i = 0; i < framesCount; i++) {
-				console.log('i', i);
+				console.log('Adding frame', i);
 
 				// Calculate progress for this frame (0 to 1)
 				const progress = i / framesCount;
@@ -433,21 +474,21 @@
 				}
 			}
 
-			console.log('gif2', gif);
+			console.log('All frames added');
 
 			// Add error handler
-			gif.on('error' as string, (error: unknown) => {
+			gif.on('error' as any, (error: any) => {
 				console.error('GIF generation error:', error);
 				alert('Error generating GIF: ' + (error instanceof Error ? error.message : String(error)));
 				isGeneratingGif = false;
 				startAnimation();
 			});
 
-			console.log('gif3', gif);
+			console.log('Error handler added');
 
 			// Event handlers
-			gif.on('progress', (p: number) => {
-				console.log('p', p);
+			gif.on('progress' as any, (p: number) => {
+				console.log('GIF progress:', p);
 				// Remaining 20% of progress is for rendering
 				gifProgress = 0.8 + p * 0.2;
 				// Update display progress less frequently to avoid rendering issues
@@ -456,10 +497,10 @@
 				}
 			});
 
-			console.log('gif4', gif);
+			console.log('Progress handler added');
 
-			gif.on('finished', (blob: Blob) => {
-				console.log('finished');
+			gif.on('finished' as any, (blob: Blob) => {
+				console.log('GIF finished!');
 				// Create download link
 				const url = URL.createObjectURL(blob);
 				const link = document.createElement('a');
@@ -482,10 +523,12 @@
 				startAnimation();
 			});
 
-			console.log('gif5', gif);
+			console.log('Finished handler added');
 
 			// Start rendering the GIF
+			console.log('Starting GIF render');
 			gif.render();
+			console.log('GIF render started');
 		} catch (error) {
 			console.error('Error setting up GIF generation:', error);
 			alert('Failed to generate GIF: ' + (error instanceof Error ? error.message : String(error)));
