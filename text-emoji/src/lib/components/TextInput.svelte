@@ -27,7 +27,7 @@
 			class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
 		></textarea>
 
-		<div class="absolute bottom-2 right-2 text-xs text-gray-500">
+		<div class="absolute right-2 bottom-2 text-xs text-gray-500">
 			{value.length}/{maxLength}
 		</div>
 	</div>

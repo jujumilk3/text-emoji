@@ -18,40 +18,42 @@
 	};
 </script>
 
-<div class="space-y-4">
-	<div>
-		<label for="font-size" class="mb-1 block text-sm font-medium text-gray-700">
-			Font Size: {fontSize}px
-		</label>
-		<input
-			id="font-size"
-			type="range"
-			min="8"
-			max="72"
-			step="1"
-			bind:value={fontSize}
-			class="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
-		/>
-	</div>
+<div class="space-y-6">
+	<h3 class="text-lg font-medium text-gray-900">Size & Position</h3>
 
-	<div>
-		<label for="padding" class="mb-1 block text-sm font-medium text-gray-700">
-			Padding: {padding}px
-		</label>
-		<input
-			id="padding"
-			type="range"
-			min="0"
-			max="50"
-			step="1"
-			bind:value={padding}
-			class="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
-		/>
+	<div class="space-y-4">
+		<div>
+			<label for="font-size" class="block text-sm font-medium text-gray-700">
+				Font Size (px): {fontSize}
+			</label>
+			<input
+				id="font-size"
+				type="range"
+				min="12"
+				max="72"
+				bind:value={fontSize}
+				class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
+			/>
+		</div>
+
+		<div>
+			<label for="padding" class="block text-sm font-medium text-gray-700">
+				Padding (px): {padding}
+			</label>
+			<input
+				id="padding"
+				type="range"
+				min="0"
+				max="30"
+				bind:value={padding}
+				class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
+			/>
+		</div>
 	</div>
 
 	<div class="grid grid-cols-2 gap-4">
 		<div>
-			<label for="horizontal-align" class="mb-1 block text-sm font-medium text-gray-700">
+			<label for="horizontal-align" class="block text-sm font-medium text-gray-700">
 				Horizontal Alignment
 			</label>
 			<select
@@ -59,7 +61,7 @@
 				bind:value={horizontalAlign}
 				class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
 			>
-				{#each alignOptions.horizontal as option}
+				{#each alignOptions.horizontal as option (option.id)}
 					<option value={option.id}>
 						{option.name}
 					</option>
@@ -68,7 +70,7 @@
 		</div>
 
 		<div>
-			<label for="vertical-align" class="mb-1 block text-sm font-medium text-gray-700">
+			<label for="vertical-align" class="block text-sm font-medium text-gray-700">
 				Vertical Alignment
 			</label>
 			<select
@@ -76,7 +78,7 @@
 				bind:value={verticalAlign}
 				class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
 			>
-				{#each alignOptions.vertical as option}
+				{#each alignOptions.vertical as option (option.id)}
 					<option value={option.id}>
 						{option.name}
 					</option>

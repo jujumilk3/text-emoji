@@ -18,7 +18,7 @@
 		bind:value={selectedFont}
 		class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
 	>
-		{#each fonts as font}
+		{#each fonts as font (font.id)}
 			<option value={font.id} style="font-family: {font.family}">
 				{font.name}
 			</option>

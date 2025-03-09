@@ -1,25 +1,58 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	export let text = '';
-	export let font = 'sans-serif';
-	export let textColor = '#000000';
-	export let backgroundColor = '#ffffff';
-	export let fontSize = 32;
-	export let padding = 10;
-	export let horizontalAlign = 'center';
-	export let verticalAlign = 'middle';
-	export let showGradient = false;
-	export let gradientColor = '#ffffff';
-	export let gradientDirection = 'to-right';
+	const {
+		text = $bindable(''),
+		font = $bindable('sans-serif'),
+		textColor = $bindable('#000000'),
+		backgroundColor = $bindable('#ffffff'),
+		fontSize = $bindable(32),
+		padding = $bindable(10),
+		horizontalAlign = $bindable('center'),
+		verticalAlign = $bindable('middle'),
+		showGradient = $bindable(false),
+		gradientColor = $bindable('#ffffff'),
+		gradientDirection = $bindable('to-right'),
+		textShadow = $bindable(false),
+		textShadowColor = $bindable('#000000'),
+		textShadowBlur = $bindable(4),
+		textShadowOffsetX = $bindable(2),
+		textShadowOffsetY = $bindable(2),
+		textBorder = $bindable(false),
+		textBorderColor = $bindable('#000000'),
+		textBorderWidth = $bindable(2),
+		textGlow = $bindable(false),
+		textGlowColor = $bindable('#ff9900'),
+		textGlowBlur = $bindable(10)
+	} = $props();
 
 	let canvas: HTMLCanvasElement;
 	let previewSize = 128;
 	let smallPreviewSize = 32;
+	let copySuccess = $state(false);
+	let copyTimeout: ReturnType<typeof setTimeout>;
 
-	$: if (canvas) {
-		renderEmoji();
-	}
+	// Debounce rendering for performance
+	let renderTimeout: ReturnType<typeof setTimeout>;
+	let lastRenderTime = 0;
+	const RENDER_DELAY = 300; // 300ms delay for rendering after text changes
+
+	$effect(() => {
+		if (canvas) {
+			// Debounce rendering
+			clearTimeout(renderTimeout);
+			const now = Date.now();
+			if (now - lastRenderTime > RENDER_DELAY) {
+				renderEmoji();
+				lastRenderTime = now;
+			} else {
+				renderTimeout = setTimeout(() => {
+					renderEmoji();
+					lastRenderTime = Date.now();
+				}, RENDER_DELAY);
+			}
+		}
+	});
 
 	onMount(() => {
 		renderEmoji();
@@ -45,9 +78,7 @@
 		}
 		ctx.fillRect(0, 0, previewSize, previewSize);
 
-		// Draw text
-		ctx.fillStyle = textColor;
-		ctx.font = `${fontSize}px ${font}`;
+		// Set text alignment
 		ctx.textAlign =
 			horizontalAlign === 'center' ? 'center' : horizontalAlign === 'right' ? 'right' : 'left';
 		ctx.textBaseline =
@@ -67,7 +98,46 @@
 					? previewSize - padding
 					: padding;
 
-		// Draw text
+		// Set font
+		ctx.font = `${fontSize}px ${font}`;
+
+		// Apply text effects
+		if (textGlow) {
+			// Draw text glow
+			ctx.save();
+			ctx.shadowColor = textGlowColor;
+			ctx.shadowBlur = textGlowBlur;
+			ctx.shadowOffsetX = 0;
+			ctx.shadowOffsetY = 0;
+			ctx.fillStyle = textGlowColor;
+			ctx.globalAlpha = 0.7;
+			ctx.fillText(text, x, y);
+			ctx.restore();
+		}
+
+		if (textShadow) {
+			// Draw text shadow
+			ctx.save();
+			ctx.fillStyle = textShadowColor;
+			ctx.shadowColor = textShadowColor;
+			ctx.shadowBlur = textShadowBlur;
+			ctx.shadowOffsetX = textShadowOffsetX;
+			ctx.shadowOffsetY = textShadowOffsetY;
+			ctx.fillText(text, x, y);
+			ctx.restore();
+		}
+
+		if (textBorder) {
+			// Draw text border/stroke
+			ctx.save();
+			ctx.strokeStyle = textBorderColor;
+			ctx.lineWidth = textBorderWidth;
+			ctx.strokeText(text, x, y);
+			ctx.restore();
+		}
+
+		// Draw main text
+		ctx.fillStyle = textColor;
 		ctx.fillText(text, x, y);
 	}
 
@@ -95,6 +165,70 @@
 		link.download = `emoji-${text.replace(/\s+/g, '-')}.png`;
 		link.href = canvas.toDataURL('image/png');
 		link.click();
+	}
+
+	async function copyToClipboard() {
+		if (!canvas) return;
+
+		try {
+			// Convert canvas to blob
+			const blob = await new Promise<Blob>((resolve) => {
+				canvas.toBlob((blob) => {
+					if (blob) resolve(blob);
+				}, 'image/png');
+			});
+
+			// Create ClipboardItem
+			const item = new ClipboardItem({ 'image/png': blob });
+
+			// Write to clipboard
+			await navigator.clipboard.write([item]);
+
+			// Show success message
+			copySuccess = true;
+
+			// Clear previous timeout if exists
+			if (copyTimeout) clearTimeout(copyTimeout);
+
+			// Hide success message after 2 seconds
+			copyTimeout = setTimeout(() => {
+				copySuccess = false;
+			}, 2000);
+		} catch (error) {
+			console.error('Failed to copy image to clipboard:', error);
+			alert(
+				'Failed to copy image to clipboard. This feature may not be supported in your browser.'
+			);
+		}
+	}
+
+	// Function to get current emoji data for saving
+	export function getEmojiData() {
+		return {
+			text,
+			font,
+			textColor,
+			backgroundColor,
+			fontSize,
+			padding,
+			horizontalAlign,
+			verticalAlign,
+			showGradient,
+			gradientColor,
+			gradientDirection,
+			textShadow,
+			textShadowColor,
+			textShadowBlur,
+			textShadowOffsetX,
+			textShadowOffsetY,
+			textBorder,
+			textBorderColor,
+			textBorderWidth,
+			textGlow,
+			textGlowColor,
+			textGlowBlur,
+			imageData: canvas?.toDataURL('image/png')
+		};
 	}
 </script>
 
@@ -150,12 +284,19 @@
 		</div>
 	</div>
 
-	<div class="flex justify-center">
+	<div class="flex justify-center space-x-4">
 		<button
-			on:click={downloadEmoji}
+			onclick={downloadEmoji}
 			class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 inline-flex items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
 		>
 			Download Emoji
+		</button>
+
+		<button
+			onclick={copyToClipboard}
+			class="focus:ring-primary-500 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2"
+		>
+			{copySuccess ? 'Copied!' : 'Copy to Clipboard'}
 		</button>
 	</div>
 </div>
