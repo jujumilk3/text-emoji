@@ -638,9 +638,6 @@
 			// Stop any running animation to control our own rendering
 			stopAnimation();
 
-			// 애니메이션 유형에 따라 프레임 생성 방식 최적화
-			let frameGenerationMethod;
-
 			// 특정 애니메이션 유형에 대해 더 많은 프레임 생성
 			const needsMoreFrames = ['rotate', 'bounce', 'pulse', 'sliding-text'].includes(animationType);
 			const actualFramesCount = needsMoreFrames ? framesCount * 1.5 : framesCount;
@@ -650,29 +647,38 @@
 				// Calculate progress for this frame (0 to 1)
 				const rawProgress = (i / actualFramesCount) % 1;
 
-				// 애니메이션 유형에 따라 프레임 진행 조정
+				// Apply animation direction, just like in animateEmoji function
 				let progress = rawProgress;
+				if (animationDirection === 'reverse') {
+					progress = 1 - rawProgress;
+				} else if (animationDirection === 'alternate') {
+					const cycle = Math.floor((i / actualFramesCount) * 2);
+					if (cycle % 2 === 1) {
+						progress = 1 - rawProgress;
+					}
+				}
 
 				// 부드러운 전환이 활성화된 경우에만 이징 적용
+				let easedProgress = progress;
 				if (gifSmoothing) {
 					// 바운스나 펄스 같은 애니메이션은 이징 함수로 부드럽게
 					if (['bounce', 'pulse'].includes(animationType)) {
 						// 사인 이징으로 부드러운 움직임
-						progress = 0.5 - 0.5 * Math.cos(rawProgress * Math.PI * 2);
+						easedProgress = 0.5 - 0.5 * Math.cos(progress * Math.PI * 2);
 					}
 					// 회전 애니메이션은 선형 진행
 					else if (animationType === 'rotate') {
-						progress = rawProgress;
+						// Keep linear progress
 					}
 					// 슬라이드 애니메이션은 약간의 가속/감속 적용
 					else if (animationType.startsWith('slide-') || animationType === 'sliding-text') {
 						// 이징 함수로 가속/감속 효과
-						progress = 0.5 - 0.5 * Math.cos(rawProgress * Math.PI);
+						easedProgress = 0.5 - 0.5 * Math.cos(progress * Math.PI);
 					}
 				}
 
 				// Render the frame at this progress point
-				renderAnimationFrame(progress);
+				renderAnimationFrame(easedProgress);
 
 				// Add the current canvas content as a frame with optimized settings
 				gif.addFrame(canvas, {
