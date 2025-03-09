@@ -41,6 +41,12 @@
 		} else {
 			animationEnabled = false;
 		}
+
+		// If animation type is 'sliding-text' and direction is 'alternate',
+		// change direction to 'normal' since alternate is not supported for sliding text
+		if (animationType === 'sliding-text' && animationDirection === 'alternate') {
+			animationDirection = 'normal';
+		}
 	}
 </script>
 
@@ -105,7 +111,9 @@
 					bind:value={animationDirection}
 				>
 					{#each directionOptions as option}
-						<option value={option.value}>{option.label}</option>
+						{#if !(animationType === 'sliding-text' && option.value === 'alternate')}
+							<option value={option.value}>{option.label}</option>
+						{/if}
 					{/each}
 				</select>
 			</div>

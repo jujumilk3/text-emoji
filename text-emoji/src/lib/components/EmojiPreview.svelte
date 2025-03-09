@@ -640,7 +640,12 @@
 
 			// 특정 애니메이션 유형에 대해 더 많은 프레임 생성
 			const needsMoreFrames = ['rotate', 'bounce', 'pulse', 'sliding-text'].includes(animationType);
-			const actualFramesCount = needsMoreFrames ? framesCount * 1.5 : framesCount;
+			let actualFramesCount = needsMoreFrames ? framesCount * 1.5 : framesCount;
+
+			// Double the frame count for alternate direction to ensure a complete cycle
+			if (animationDirection === 'alternate') {
+				actualFramesCount *= 2;
+			}
 
 			// Add frames to the GIF
 			for (let i = 0; i < actualFramesCount; i++) {
