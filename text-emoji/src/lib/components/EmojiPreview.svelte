@@ -42,7 +42,8 @@
 	let animationFrame: number | null = $state(null);
 	let animationStartTime: number | null = $state(null);
 	let isGeneratingGif = $state(false);
-	let gifProgress = $state(0);
+	let gifProgress = 0;
+	let displayGifProgress = $state(0);
 
 	// Track changes to trigger rendering
 	let renderKey = $state(0);
@@ -384,9 +385,9 @@
 
 		isGeneratingGif = true;
 		gifProgress = 0;
+		displayGifProgress = 0;
 
 		console.log('Creating GIF');
-		console.log(gifProgress);
 
 		// Create a GIF encoder
 		const gif = new GIF({
@@ -415,16 +416,25 @@
 			// Add the current canvas content as a frame
 			gif.addFrame(canvas, { copy: true, delay: animationSpeed / framesCount });
 
-			// Update progress
+			// Update progress (non-reactive)
 			gifProgress = ((i + 1) / framesCount) * 0.8; // 80% of progress is for frame generation
-			console.log('Progress updated');
-			console.log(gifProgress);
+			// Update display progress (reactive, but only once per frame)
+			if (i % 5 === 0 || i === framesCount - 1) {
+				displayGifProgress = gifProgress;
+			}
+			console.log(displayGifProgress);
 		}
 
 		// Event handlers
 		gif.on('progress', (p: number) => {
-			// Remaining 20% of progress is for rendering
+			console.log('Progress updated');
+			console.log(p);
+			// Remaining 20% of progress is for rendering (non-reactive update)
 			gifProgress = 0.8 + p * 0.2;
+			// Update display progress less frequently to avoid infinite loops
+			if (Math.round(p * 10) % 2 === 0) {
+				displayGifProgress = gifProgress;
+			}
 		});
 
 		gif.on('finished', (blob: Blob) => {
@@ -440,6 +450,7 @@
 			URL.revokeObjectURL(url);
 			isGeneratingGif = false;
 			gifProgress = 0;
+			displayGifProgress = 0;
 
 			// Restart the animation preview
 			startAnimation();
@@ -604,7 +615,7 @@
 						d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
 					></path>
 				</svg>
-				Generating GIF ({Math.round(gifProgress * 100)}%)
+				Generating GIF ({Math.round(displayGifProgress * 100)}%)
 			{:else}
 				Download {animationEnabled && animationType !== 'none' ? 'GIF' : 'PNG'}
 			{/if}
