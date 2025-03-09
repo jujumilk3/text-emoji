@@ -203,9 +203,9 @@
 <div class="py-6">
 	<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 		<div class="mb-8 text-center">
-			<h1 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">Slack Emoji Generator</h1>
+			<h1 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">Text Emoji Generator</h1>
 			<p class="mx-auto mt-3 max-w-2xl text-xl text-gray-500 sm:mt-4">
-				Create custom text-based emojis for Slack in seconds
+				Create custom text-based emojis for Slack, Discord, and more in seconds
 			</p>
 		</div>
 
@@ -310,7 +310,7 @@
 				<li>4. Adjust size and position settings</li>
 				<li>5. Add text effects like shadows or borders</li>
 				<li>6. Download your emoji or copy to clipboard</li>
-				<li>7. Upload to Slack in your workspace settings</li>
+				<li>7. Upload to Slack, Discord, or other platforms in your workspace settings</li>
 			</ol>
 		</div>
 	</div>
