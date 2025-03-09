@@ -50,6 +50,8 @@
 	let emojiPreviewComponent: EmojiPreview;
 	let recentEmojisComponent: RecentEmojis;
 
+	const maxTextLength = 20;
+
 	// Handle template selection
 	function handleTemplateSelect(event: CustomEvent<EmojiTemplate>) {
 		const template = event.detail;
@@ -186,7 +188,7 @@
 			<div class="sm:col-span-4">
 				<div class="space-y-6">
 					<div class="overflow-hidden rounded-lg bg-white p-6 shadow">
-						<TextInput bind:value={text} maxLength={20} />
+						<TextInput bind:value={text} maxLength={maxTextLength} />
 					</div>
 
 					<div class="overflow-hidden rounded-lg bg-white p-6 shadow">
@@ -294,7 +296,7 @@
 		<div class="mt-12 text-center">
 			<h2 class="text-2xl font-bold text-gray-900">How to Use</h2>
 			<ol class="mx-auto mt-4 max-w-3xl space-y-2 text-left text-gray-600">
-				<li>1. Enter the text for your emoji (max 10 characters)</li>
+				<li>1. Enter the text for your emoji (max {maxTextLength} characters)</li>
 				<li>2. Choose a font style that fits your needs</li>
 				<li>3. Select colors for text and background</li>
 				<li>4. Adjust size and position settings</li>
