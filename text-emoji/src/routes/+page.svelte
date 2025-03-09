@@ -7,63 +7,7 @@
 	import TextEffects from '$lib/components/TextEffects.svelte';
 	import PresetTemplates from '$lib/components/PresetTemplates.svelte';
 	import RecentEmojis from '$lib/components/RecentEmojis.svelte';
-
-	// Define template and emoji interfaces
-	interface EmojiTemplate {
-		id: string;
-		name: string;
-		text: string;
-		font: string;
-		textColor: string;
-		backgroundColor: string;
-		fontSize: number;
-		padding: number;
-		horizontalAlign: string;
-		verticalAlign: string;
-		showGradient: boolean;
-		gradientColor?: string;
-		gradientDirection?: string;
-		textShadow?: boolean;
-		textShadowColor?: string;
-		textShadowBlur?: number;
-		textShadowOffsetX?: number;
-		textShadowOffsetY?: number;
-		textBorder?: boolean;
-		textBorderColor?: string;
-		textBorderWidth?: number;
-		textGlow?: boolean;
-		textGlowColor?: string;
-		textGlowBlur?: number;
-	}
-
-	// Update SavedEmoji interface to match the one in RecentEmojis.svelte
-	interface SavedEmoji {
-		id: string;
-		text: string;
-		font: string;
-		textColor: string;
-		backgroundColor: string;
-		fontSize: number;
-		padding: number;
-		horizontalAlign: string;
-		verticalAlign: string;
-		showGradient: boolean;
-		gradientColor?: string;
-		gradientDirection?: string;
-		textShadow?: boolean;
-		textShadowColor?: string;
-		textShadowBlur?: number;
-		textShadowOffsetX?: number;
-		textShadowOffsetY?: number;
-		textBorder?: boolean;
-		textBorderColor?: string;
-		textBorderWidth?: number;
-		textGlow?: boolean;
-		textGlowColor?: string;
-		textGlowBlur?: number;
-		timestamp: number;
-		imageData?: string;
-	}
+	import type { EmojiTemplate, SavedEmoji } from '$lib/types/emoji';
 
 	// Emoji state
 	let text = $state('Hi!');

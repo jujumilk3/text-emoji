@@ -1,35 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { createEventDispatcher } from 'svelte';
-
-	// Define the emoji interface
-	interface SavedEmoji {
-		id: string;
-		text: string;
-		font: string;
-		textColor: string;
-		backgroundColor: string;
-		fontSize: number;
-		padding: number;
-		horizontalAlign: string;
-		verticalAlign: string;
-		showGradient: boolean;
-		gradientColor?: string;
-		gradientDirection?: string;
-		textShadow?: boolean;
-		textShadowColor?: string;
-		textShadowBlur?: number;
-		textShadowOffsetX?: number;
-		textShadowOffsetY?: number;
-		textBorder?: boolean;
-		textBorderColor?: string;
-		textBorderWidth?: number;
-		textGlow?: boolean;
-		textGlowColor?: string;
-		textGlowBlur?: number;
-		timestamp: number;
-		imageData?: string;
-	}
+	import { CloseIcon } from '$lib/components/icons';
+	import type { SavedEmoji } from '$lib/types/emoji';
 
 	// Event dispatcher for emoji selection
 	const dispatch = createEventDispatcher<{ select: SavedEmoji }>();
@@ -122,22 +95,11 @@
 					</button>
 
 					<button
-						class="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
 						onclick={() => deleteEmoji(emoji.id)}
+						class="absolute -right-2 -top-2 rounded-full bg-red-500 p-1 text-white shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
 						aria-label="Delete emoji"
 					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-4 w-4"
-							viewBox="0 0 20 20"
-							fill="currentColor"
-						>
-							<path
-								fill-rule="evenodd"
-								d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-								clip-rule="evenodd"
-							/>
-						</svg>
+						<CloseIcon />
 					</button>
 				</div>
 			{/each}

@@ -1,33 +1,7 @@
 <script lang="ts">
 	// Preset templates for quick emoji creation
-
-	// Define the template interface
-	interface EmojiTemplate {
-		id: string;
-		name: string;
-		text: string;
-		font: string;
-		textColor: string;
-		backgroundColor: string;
-		fontSize: number;
-		padding: number;
-		horizontalAlign: string;
-		verticalAlign: string;
-		showGradient: boolean;
-		gradientColor?: string;
-		gradientDirection?: string;
-		textShadow?: boolean;
-		textShadowColor?: string;
-		textShadowBlur?: number;
-		textShadowOffsetX?: number;
-		textShadowOffsetY?: number;
-		textBorder?: boolean;
-		textBorderColor?: string;
-		textBorderWidth?: number;
-		textGlow?: boolean;
-		textGlowColor?: string;
-		textGlowBlur?: number;
-	}
+	import { createEventDispatcher } from 'svelte';
+	import type { EmojiTemplate } from '$lib/types/emoji';
 
 	// Define preset templates
 	const templates: EmojiTemplate[] = [
@@ -151,7 +125,6 @@
 	];
 
 	// Event dispatcher for template selection
-	import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher<{ select: EmojiTemplate }>();
 
 	function selectTemplate(template: EmojiTemplate) {
