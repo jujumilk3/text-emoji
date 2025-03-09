@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import GIF from 'gif.js';
 
 	let {
 		text = $bindable(''),
@@ -40,6 +41,8 @@
 	let copyTimeout: ReturnType<typeof setTimeout>;
 	let animationFrame: number | null = $state(null);
 	let animationStartTime: number | null = $state(null);
+	let isGeneratingGif = $state(false);
+	let gifProgress = $state(0);
 
 	// Track changes to trigger rendering
 	let renderKey = $state(0);
@@ -364,10 +367,86 @@
 	function downloadEmoji() {
 		if (!canvas) return;
 
-		const link = document.createElement('a');
-		link.download = `emoji-${text.replace(/\s+/g, '-')}.png`;
-		link.href = canvas.toDataURL('image/png');
-		link.click();
+		// If animation is enabled, create and download a GIF
+		if (animationEnabled && animationType !== 'none') {
+			createAndDownloadGif();
+		} else {
+			// For static emojis, download as PNG
+			const link = document.createElement('a');
+			link.download = `emoji-${text.replace(/\s+/g, '-')}.png`;
+			link.href = canvas.toDataURL('image/png');
+			link.click();
+		}
+	}
+
+	function createAndDownloadGif() {
+		if (!canvas) return;
+
+		isGeneratingGif = true;
+		gifProgress = 0;
+
+		console.log('Creating GIF');
+		console.log(gifProgress);
+
+		// Create a GIF encoder
+		const gif = new GIF({
+			workers: 2,
+			quality: 10,
+			width: previewSize,
+			height: previewSize,
+			workerScript: '/gif.worker.js', // Make sure this path is correct
+			background: backgroundColor
+		});
+
+		// Number of frames to capture for one animation cycle
+		const framesCount = 20; // Adjust for smoother or faster GIF
+
+		// Stop any running animation to control our own rendering
+		stopAnimation();
+
+		// Add frames to the GIF
+		for (let i = 0; i < framesCount; i++) {
+			// Calculate progress for this frame (0 to 1)
+			const progress = i / framesCount;
+
+			// Render the frame at this progress point
+			renderAnimationFrame(progress);
+
+			// Add the current canvas content as a frame
+			gif.addFrame(canvas, { copy: true, delay: animationSpeed / framesCount });
+
+			// Update progress
+			gifProgress = ((i + 1) / framesCount) * 0.8; // 80% of progress is for frame generation
+			console.log('Progress updated');
+			console.log(gifProgress);
+		}
+
+		// Event handlers
+		gif.on('progress', (p: number) => {
+			// Remaining 20% of progress is for rendering
+			gifProgress = 0.8 + p * 0.2;
+		});
+
+		gif.on('finished', (blob: Blob) => {
+			console.log('GIF finished');
+			// Create download link
+			const url = URL.createObjectURL(blob);
+			const link = document.createElement('a');
+			link.href = url;
+			link.download = `emoji-${text.replace(/\s+/g, '-')}.gif`;
+			link.click();
+
+			// Clean up
+			URL.revokeObjectURL(url);
+			isGeneratingGif = false;
+			gifProgress = 0;
+
+			// Restart the animation preview
+			startAnimation();
+		});
+
+		// Start rendering the GIF
+		gif.render();
 	}
 
 	async function copyToClipboard() {
@@ -506,8 +585,29 @@
 		<button
 			onclick={downloadEmoji}
 			class="focus:ring-primary-500 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2"
+			disabled={isGeneratingGif}
 		>
-			Download Emoji
+			{#if isGeneratingGif}
+				<svg class="mr-2 h-4 w-4 animate-spin" viewBox="0 0 24 24">
+					<circle
+						class="opacity-25"
+						cx="12"
+						cy="12"
+						r="10"
+						stroke="currentColor"
+						stroke-width="4"
+						fill="none"
+					></circle>
+					<path
+						class="opacity-75"
+						fill="currentColor"
+						d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+					></path>
+				</svg>
+				Generating GIF ({Math.round(gifProgress * 100)}%)
+			{:else}
+				Download {animationEnabled && animationType !== 'none' ? 'GIF' : 'PNG'}
+			{/if}
 		</button>
 
 		<button
