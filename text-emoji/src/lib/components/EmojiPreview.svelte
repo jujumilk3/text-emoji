@@ -26,7 +26,7 @@
 		textGlowBlur = $bindable(10)
 	} = $props();
 
-	let canvas: HTMLCanvasElement;
+	let canvas = $state<HTMLCanvasElement | null>(null);
 	let previewSize = 128;
 	let smallPreviewSize = 32;
 	let copySuccess = $state(false);
@@ -59,7 +59,7 @@
 	});
 
 	function renderEmoji() {
-		const ctx = canvas.getContext('2d');
+		const ctx = canvas?.getContext('2d');
 		if (!ctx) return;
 
 		// Set canvas dimensions
