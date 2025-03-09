@@ -134,10 +134,15 @@
 		if (canvas) {
 			// If animation is enabled, start animation loop
 			if (animationEnabled && animationType !== 'none') {
+				// Stop any existing animation first to ensure a clean restart
+				stopAnimation();
+
 				// For sliding text animation, prepare the sliding text canvas
 				if (animationType === 'sliding-text') {
 					prepareSlidingTextCanvas();
 				}
+				// Start animation with a reset animation start time to ensure proper direction
+				animationStartTime = null;
 				startAnimation();
 			} else {
 				// Otherwise, just render once
@@ -173,7 +178,7 @@
 		const textMetrics = tempCtx.measureText(text);
 
 		// Calculate total width needed for sliding text
-		// Add extra padding on both sides
+		// Add extra padding on both sides to ensure smooth scrolling in both directions
 		slidingTextWidth = Math.ceil(textMetrics.width) + slidingTextPadding * 2;
 
 		// Create or resize the sliding text canvas
@@ -260,7 +265,7 @@
 
 	function startAnimation() {
 		// Stop any existing animation
-		// stopAnimation();
+		stopAnimation();
 
 		// Reset animation start time
 		animationStartTime = null;
@@ -302,12 +307,16 @@
 		let progress = (effectiveElapsedTime % animationSpeed) / animationSpeed;
 
 		// Apply direction
-		if (animationDirection === 'reverse') {
-			progress = 1 - progress;
-		} else if (animationDirection === 'alternate') {
-			const cycle = Math.floor(effectiveElapsedTime / animationSpeed);
-			if (cycle % 2 === 1) {
+		// For sliding-text, we'll handle the direction in renderAnimationFrame
+		// to avoid double-reversing the animation
+		if (animationType !== 'sliding-text') {
+			if (animationDirection === 'reverse') {
 				progress = 1 - progress;
+			} else if (animationDirection === 'alternate') {
+				const cycle = Math.floor(effectiveElapsedTime / animationSpeed);
+				if (cycle % 2 === 1) {
+					progress = 1 - progress;
+				}
 			}
 		}
 
@@ -360,8 +369,11 @@
 			const totalMovement = slidingTextWidth - previewSize;
 			let offset;
 
+			// For sliding-text animation, we handle the direction directly here
+			// rather than modifying the progress value in animateEmoji
 			if (animationDirection === 'reverse') {
-				// Left to right (now reverse means left to right)
+				// Left to right (reverse direction)
+				// For reverse, we want to start at the end (right side) and move left
 				offset = (1 - progress) * totalMovement;
 			} else if (animationDirection === 'alternate') {
 				// Alternate between directions
@@ -370,7 +382,8 @@
 				offset =
 					cycle % 2 === 0 ? cycleProgress * totalMovement : (1 - cycleProgress) * totalMovement;
 			} else {
-				// Right to left (now normal means right to left)
+				// Right to left (normal direction)
+				// For normal, we want to start at the beginning (left side) and move right
 				offset = progress * totalMovement;
 			}
 
@@ -644,12 +657,16 @@
 
 				// Apply animation direction, just like in animateEmoji function
 				let progress = rawProgress;
-				if (animationDirection === 'reverse') {
-					progress = 1 - rawProgress;
-				} else if (animationDirection === 'alternate') {
-					const cycle = Math.floor((i / actualFramesCount) * 2);
-					if (cycle % 2 === 1) {
+				// For sliding-text, we'll handle the direction in renderAnimationFrame
+				// to avoid double-reversing the animation
+				if (animationType !== 'sliding-text') {
+					if (animationDirection === 'reverse') {
 						progress = 1 - rawProgress;
+					} else if (animationDirection === 'alternate') {
+						const cycle = Math.floor((i / actualFramesCount) * 2);
+						if (cycle % 2 === 1) {
+							progress = 1 - rawProgress;
+						}
 					}
 				}
 
