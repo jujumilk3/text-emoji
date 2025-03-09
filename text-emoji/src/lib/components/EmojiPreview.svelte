@@ -55,6 +55,11 @@
 		animationDirection = $bindable('normal')
 	} = $props();
 
+	// GIF 생성 관련 설정
+	let gifQuality = $state(1); // 1-20, 낮을수록 품질 좋음
+	let gifFrameCount = $state(60); // 기본 프레임 수
+	let gifSmoothing = $state(true); // 프레임 간 부드러운 전환 활성화
+
 	let canvas = $state<HTMLCanvasElement | null>(null);
 	let previewSize = 128;
 	let smallPreviewSize = 32;
@@ -217,6 +222,14 @@
 		}
 	}
 
+	// 보간(interpolation) 함수 추가
+	function interpolate(start: number, end: number, progress: number): number {
+		// 이징(easing) 함수 적용 - 부드러운 시작과 끝
+		// 사인 이징 함수 사용
+		const easedProgress = 0.5 - 0.5 * Math.cos(progress * Math.PI);
+		return start + (end - start) * easedProgress;
+	}
+
 	function renderAnimationFrame(progress: number) {
 		if (!canvas) return;
 
@@ -270,34 +283,45 @@
 
 		// Apply different animations based on type
 		if (animationEnabled && animationType !== 'none') {
+			// 부드러운 애니메이션을 위한 이징 적용
+			const easedProgress = 0.5 - 0.5 * Math.cos(progress * Math.PI * 2);
+
 			switch (animationType) {
 				case 'slide-left-to-right':
-					translateX = (progress - 0.5) * previewSize;
+					translateX = interpolate(-previewSize / 2, previewSize / 2, progress);
 					break;
 				case 'slide-right-to-left':
-					translateX = (0.5 - progress) * previewSize;
+					translateX = interpolate(previewSize / 2, -previewSize / 2, progress);
 					break;
 				case 'slide-top-to-bottom':
-					translateY = (progress - 0.5) * previewSize;
+					translateY = interpolate(-previewSize / 2, previewSize / 2, progress);
 					break;
 				case 'slide-bottom-to-top':
-					translateY = (0.5 - progress) * previewSize;
+					translateY = interpolate(previewSize / 2, -previewSize / 2, progress);
 					break;
 				case 'fade-in-out':
-					// Fade in for first half, fade out for second half
-					alpha = progress < 0.5 ? progress * 2 : 2 - progress * 2;
+					// 부드러운 페이드 인/아웃
+					alpha =
+						progress < 0.5
+							? interpolate(0, 1, progress * 2)
+							: interpolate(1, 0, (progress - 0.5) * 2);
 					break;
 				case 'pulse':
-					// Scale between 0.8 and 1.2
-					scale = 0.8 + 0.4 * Math.sin(progress * Math.PI * 2);
+					// 부드러운 펄스 효과
+					scale = interpolate(0.8, 1.2, easedProgress);
 					break;
 				case 'rotate':
-					// Rotate 360 degrees
+					// 부드러운 회전
 					rotation = progress * Math.PI * 2;
 					break;
 				case 'bounce':
-					// Simple bounce effect
+					// 부드러운 바운스 효과
 					translateY = -Math.abs(Math.sin(progress * Math.PI)) * 20;
+					// 바운스 정점에서 약간 멈추는 효과 추가
+					if (progress > 0.4 && progress < 0.6) {
+						const peakFactor = 1 - Math.abs((progress - 0.5) * 10); // 0.5에 가까울수록 1에 가까움
+						translateY *= 1 + peakFactor * 0.2; // 정점에서 약간 더 높게
+					}
 					break;
 			}
 		}
@@ -429,14 +453,17 @@
 				throw new Error('GIF.js library is not properly loaded');
 			}
 
-			// Create a GIF encoder
+			// Create a GIF encoder with improved quality settings
 			const gif = new GIF({
-				workers: 2,
-				quality: 10,
+				workers: 4, // 더 많은 워커 사용
+				quality: gifQuality, // 사용자 설정 품질
 				width: previewSize,
 				height: previewSize,
-				workerScript: './gif.worker.js', // Fix the path to the worker script
-				background: backgroundColor
+				workerScript: './gif.worker.js',
+				background: backgroundColor,
+				dither: false, // 디더링 비활성화로 색상 전환 부드럽게
+				transparent: null, // 투명도 없음
+				debug: true // 디버깅 활성화
 			});
 
 			// Verify that the GIF object was created properly
@@ -446,30 +473,66 @@
 
 			console.log('gif created', gif);
 
-			// Number of frames to capture for one animation cycle
-			const framesCount = 30; // Increased for smoother animation
-			const frameDelay = Math.max(50, animationSpeed / framesCount); // Ensure minimum delay of 50ms per frame
+			// 사용자 설정 프레임 수 사용
+			const framesCount = gifFrameCount;
+
+			// 애니메이션 속도에 따라 프레임 간 딜레이 조정
+			// 빠른 애니메이션은 더 짧은 딜레이, 느린 애니메이션은 더 긴 딜레이
+			const speedFactor = Math.min(2, Math.max(0.5, 1000 / animationSpeed));
+			const frameDelay = Math.max(20, Math.min(100, 40 / speedFactor));
+
+			console.log(`Animation speed: ${animationSpeed}ms, Frame delay: ${frameDelay}ms`);
 
 			// Stop any running animation to control our own rendering
 			stopAnimation();
 
-			// Add frames to the GIF
-			for (let i = 0; i < framesCount; i++) {
-				console.log('Adding frame', i);
+			// 애니메이션 유형에 따라 프레임 생성 방식 최적화
+			let frameGenerationMethod;
 
+			// 특정 애니메이션 유형에 대해 더 많은 프레임 생성
+			const needsMoreFrames = ['rotate', 'bounce', 'pulse'].includes(animationType);
+			const actualFramesCount = needsMoreFrames ? framesCount * 1.5 : framesCount;
+
+			// Add frames to the GIF
+			for (let i = 0; i < actualFramesCount; i++) {
 				// Calculate progress for this frame (0 to 1)
-				const progress = i / framesCount;
+				const rawProgress = (i / actualFramesCount) % 1;
+
+				// 애니메이션 유형에 따라 프레임 진행 조정
+				let progress = rawProgress;
+
+				// 부드러운 전환이 활성화된 경우에만 이징 적용
+				if (gifSmoothing) {
+					// 바운스나 펄스 같은 애니메이션은 이징 함수로 부드럽게
+					if (['bounce', 'pulse'].includes(animationType)) {
+						// 사인 이징으로 부드러운 움직임
+						progress = 0.5 - 0.5 * Math.cos(rawProgress * Math.PI * 2);
+					}
+					// 회전 애니메이션은 선형 진행
+					else if (animationType === 'rotate') {
+						progress = rawProgress;
+					}
+					// 슬라이드 애니메이션은 약간의 가속/감속 적용
+					else if (animationType.startsWith('slide-')) {
+						// 이징 함수로 가속/감속 효과
+						progress = 0.5 - 0.5 * Math.cos(rawProgress * Math.PI);
+					}
+				}
 
 				// Render the frame at this progress point
 				renderAnimationFrame(progress);
 
-				// Add the current canvas content as a frame
-				gif.addFrame(canvas, { copy: true, delay: frameDelay });
+				// Add the current canvas content as a frame with optimized settings
+				gif.addFrame(canvas, {
+					copy: true,
+					delay: frameDelay,
+					dispose: 2 // 이전 프레임을 지우고 새 프레임 그리기 (더 부드러운 전환)
+				});
 
 				// Update progress (non-reactive)
-				gifProgress = ((i + 1) / framesCount) * 0.8; // 80% of progress is for frame generation
+				gifProgress = ((i + 1) / actualFramesCount) * 0.8; // 80% of progress is for frame generation
 				// Update display progress (reactive, but only once per frame)
-				if (i % 5 === 0 || i === framesCount - 1) {
+				if (i % 5 === 0 || i === actualFramesCount - 1) {
 					displayGifProgress = gifProgress;
 				}
 			}
@@ -668,6 +731,67 @@
 			</div>
 		</div>
 	</div>
+
+	{#if animationEnabled && animationType !== 'none'}
+		<div class="rounded-md border bg-white p-4">
+			<h3 class="mb-4 text-lg font-medium text-gray-900">GIF 품질 설정</h3>
+
+			<div class="space-y-4">
+				<div>
+					<label for="gif-quality" class="block text-sm font-medium text-gray-700">
+						GIF 품질 (낮을수록 고품질, 파일 크기 증가)
+					</label>
+					<input
+						type="range"
+						id="gif-quality"
+						bind:value={gifQuality}
+						min="1"
+						max="20"
+						step="1"
+						class="mt-1 block w-full rounded-md border-gray-300"
+					/>
+					<div class="mt-1 flex justify-between text-xs text-gray-500">
+						<span>고품질</span>
+						<span>현재: {gifQuality}</span>
+						<span>저품질</span>
+					</div>
+				</div>
+
+				<div>
+					<label for="gif-frames" class="block text-sm font-medium text-gray-700">
+						프레임 수 (높을수록 부드러움, 파일 크기 증가)
+					</label>
+					<input
+						type="range"
+						id="gif-frames"
+						bind:value={gifFrameCount}
+						min="30"
+						max="120"
+						step="10"
+						class="mt-1 block w-full rounded-md border-gray-300"
+					/>
+					<div class="mt-1 flex justify-between text-xs text-gray-500">
+						<span>적음</span>
+						<span>현재: {gifFrameCount}프레임</span>
+						<span>많음</span>
+					</div>
+				</div>
+
+				<div class="flex items-center">
+					<input
+						id="gif-smoothing"
+						name="gif-smoothing"
+						type="checkbox"
+						bind:checked={gifSmoothing}
+						class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+					/>
+					<label for="gif-smoothing" class="ml-2 block text-sm text-gray-900">
+						프레임 간 부드러운 전환 활성화
+					</label>
+				</div>
+			</div>
+		</div>
+	{/if}
 
 	<div class="flex justify-center space-x-4">
 		<button
