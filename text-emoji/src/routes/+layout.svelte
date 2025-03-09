@@ -3,6 +3,10 @@
 	let { children } = $props();
 </script>
 
+<svelte:head>
+	<title>Text Emoji Generator</title>
+</svelte:head>
+
 <div class="min-h-screen bg-gray-50">
 	<header class="bg-white shadow">
 		<div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
