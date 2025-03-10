@@ -55,8 +55,8 @@
 	} = $props();
 
 	// GIF generation settings
-	let gifQuality = $state(1); // 1-20, lower is better quality
-	let gifFrameCount = $state(60); // Default frame count
+	let gifQuality = $state(10); // 1-20, lower is better quality
+	let gifFrameCount = $state(30); // Default frame count
 	let gifSmoothing = $state(true); // Enable smooth transition between frames
 
 	let canvas = $state<HTMLCanvasElement | null>(null);
@@ -923,8 +923,8 @@
 						type="range"
 						id="gif-frames"
 						bind:value={gifFrameCount}
-						min="30"
-						max="120"
+						min="5"
+						max="60"
 						step="10"
 						class="mt-1 block w-full rounded-md border-gray-300"
 					/>
@@ -991,15 +991,24 @@
 						clip-rule="evenodd"
 					/>
 				</svg>
-				Download {animationEnabled && animationType !== 'none' ? 'GIF' : 'PNG'}
+				{#if animationEnabled && animationType !== 'none'}
+					<span class="flex flex-col">
+						<span>Download GIF</span>
+						<span class="text-xs">(Slack icon size limit is 128KB)</span>
+					</span>
+				{:else}
+					Download PNG
+				{/if}
 			{/if}
 		</button>
 
-		<button
-			onclick={copyToClipboard}
-			class="focus:ring-primary-500 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2"
-		>
-			{copySuccess ? 'Copied!' : 'Copy to Clipboard'}
-		</button>
+		{#if !animationEnabled || animationType === 'none'}
+			<button
+				onclick={copyToClipboard}
+				class="focus:ring-primary-500 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2"
+			>
+				{copySuccess ? 'Copied!' : 'Copy to Clipboard'}
+			</button>
+		{/if}
 	</div>
 </div>
