@@ -183,8 +183,9 @@ export function parseUrlToEmoji(url: URL | URLSearchParams): Partial<EmojiTempla
  */
 export function generateShareableUrl(template: EmojiTemplate): string {
   const baseUrl = window.location.origin;
+  const basePath = '/text-emoji';
   const queryString = serializeEmojiToUrl(template);
-  return `${baseUrl}?${queryString}`;
+  return `${baseUrl}${basePath}/?${queryString}`;
 }
 
 /**
