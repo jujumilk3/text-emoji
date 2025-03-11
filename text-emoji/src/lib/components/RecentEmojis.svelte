@@ -42,8 +42,8 @@
 			recentEmojis = [newEmoji, ...recentEmojis];
 
 			// Limit to 8 most recent
-			if (recentEmojis.length > 8) {
-				recentEmojis = recentEmojis.slice(0, 8);
+			if (recentEmojis.length > 6) {
+				recentEmojis = recentEmojis.slice(0, 6);
 			}
 
 			// Save to localStorage
@@ -63,6 +63,26 @@
 		recentEmojis = recentEmojis.filter((emoji) => emoji.id !== id);
 		localStorage.setItem('recentEmojis', JSON.stringify(recentEmojis));
 	}
+
+	// Helper function to create gradient background style
+	function getBackgroundStyle(emoji: SavedEmoji): string {
+		if (emoji.showGradient && emoji.gradientColor) {
+			const direction = emoji.gradientDirection || 'to-right';
+			return `background: linear-gradient(${
+				direction === 'to-right'
+					? '90deg'
+					: direction === 'to-left'
+						? '270deg'
+						: direction === 'to-bottom'
+							? '180deg'
+							: direction === 'to-top'
+								? '0deg'
+								: '90deg'
+			}, 
+				  ${emoji.backgroundColor}, ${emoji.gradientColor});`;
+		}
+		return `background-color: ${emoji.backgroundColor};`;
+	}
 </script>
 
 <div class="space-y-4">
@@ -73,7 +93,7 @@
 			No recent emojis. Create and save some emojis to see them here.
 		</p>
 	{:else}
-		<div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+		<div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
 			{#each recentEmojis as emoji (emoji.id)}
 				<div class="relative">
 					<button
@@ -81,17 +101,37 @@
 						onclick={() => selectEmoji(emoji)}
 					>
 						{#if emoji.imageData}
-							<img src={emoji.imageData} alt={emoji.text} class="mb-2 h-16 w-16 rounded-md" />
+							<img src={emoji.imageData} alt={emoji.text} class="mb-2 h-20 w-20 rounded-md" />
 						{:else}
 							<div
-								class="mb-2 flex h-16 w-16 items-center justify-center rounded-md"
-								style="background-color: {emoji.backgroundColor}; color: {emoji.textColor}; font-family: {emoji.font}; font-size: {emoji.fontSize /
-									3}px;"
+								class="mb-2 flex h-20 w-20 items-center justify-center overflow-hidden rounded-md"
+								style="{getBackgroundStyle(
+									emoji
+								)} color: {emoji.textColor}; font-family: {emoji.font};"
 							>
-								{emoji.text}
+								<div
+									class="overflow-hidden text-ellipsis px-1 text-center"
+									style="max-width: 100%; max-height: 100%; font-size: {Math.min(
+										emoji.fontSize / 2.5,
+										20
+									)}px; 
+									   {emoji.textBorder
+										? `text-shadow: -1px -1px 0 ${emoji.textBorderColor}, 1px -1px 0 ${emoji.textBorderColor}, -1px 1px 0 ${emoji.textBorderColor}, 1px 1px 0 ${emoji.textBorderColor};`
+										: ''}
+									   {emoji.textGlow
+										? `filter: drop-shadow(0 0 ${Math.min(emoji.textGlowBlur || 0 / 2, 5)}px ${emoji.textGlowColor});`
+										: ''}
+									   {emoji.textShadow
+										? `text-shadow: ${Math.min(emoji.textShadowOffsetX || 0 / 2, 2)}px ${Math.min(emoji.textShadowOffsetY || 0 / 2, 2)}px ${Math.min(emoji.textShadowBlur || 0 / 2, 3)}px ${emoji.textShadowColor};`
+										: ''}"
+								>
+									{emoji.text.length > 10 ? emoji.text.substring(0, 10) + '...' : emoji.text}
+								</div>
 							</div>
 						{/if}
-						<span class="max-w-full truncate text-xs font-medium text-gray-900">{emoji.text}</span>
+						<span class="max-w-full truncate text-center text-sm font-medium text-gray-900"
+							>{emoji.text}</span
+						>
 					</button>
 
 					<button
