@@ -80,25 +80,7 @@
 	let slidingTextPadding = 128; // Padding for sliding text animation
 
 	// Track changes to trigger rendering
-	let renderKey = $state(0);
-
-	// Listen for document-wide key events to trigger rendering
-	function setupKeyListeners() {
-		const handleKeyEvent = () => {
-			renderKey++;
-			renderEmoji();
-		};
-
-		// Add event listeners for key events
-		window.addEventListener('keyup', handleKeyEvent);
-		window.addEventListener('keydown', handleKeyEvent);
-
-		// Return cleanup function
-		return () => {
-			window.removeEventListener('keyup', handleKeyEvent);
-			window.removeEventListener('keydown', handleKeyEvent);
-		};
-	}
+	// let renderKey = $state(0);
 
 	// Watch for changes in all properties to trigger rendering
 	$effect(() => {
@@ -131,8 +113,9 @@
 			animationDuration,
 			animationDelay,
 			animationLoop,
-			animationDirection,
-			renderKey
+			animationDirection
+			// Remove renderKey from dependencies
+			// renderKey
 		];
 
 		if (canvas) {
@@ -162,8 +145,9 @@
 		renderEmoji();
 		// Preload the worker script
 		preloadWorkerScript();
-		// Setup key listeners and store cleanup function
-		const cleanup = setupKeyListeners();
+
+		// Remove the keyboard event listeners setup
+		// const cleanup = setupKeyListeners();
 
 		// Initialize the preview image URL after the first render
 		if (canvas) {
@@ -172,7 +156,8 @@
 
 		// Return cleanup function for onMount
 		return () => {
-			cleanup();
+			// Remove the cleanup call for keyboard listeners
+			// cleanup();
 			stopAnimation();
 		};
 	});
@@ -858,7 +843,8 @@
 
 	// Function to manually trigger a render
 	export function forceRender() {
-		renderKey++;
+		// Don't use renderKey anymore
+		// renderKey++;
 		renderEmoji();
 	}
 
