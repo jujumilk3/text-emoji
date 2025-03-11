@@ -158,6 +158,27 @@
 			animationDelay: 0,
 			animationLoop: true,
 			animationDirection: 'normal'
+		},
+		{
+			id: 'template-10',
+			name: 'FIRE!!',
+			text: '🔥FIRE!!🔥🔥🚒🚒🚒',
+			font: 'sans-serif',
+			textColor: '#a80000',
+			backgroundColor: '#efff75',
+			fontSize: 72,
+			padding: 10,
+			horizontalAlign: 'center',
+			verticalAlign: 'middle',
+			showGradient: true,
+			gradientColor: '#ff3333',
+			gradientDirection: 'to-bottom',
+			animationEnabled: true,
+			animationType: 'sliding-text',
+			animationDuration: 2000,
+			animationDelay: 0,
+			animationLoop: true,
+			animationDirection: 'normal'
 		}
 	];
 
