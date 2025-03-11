@@ -40,7 +40,7 @@
 		{#each templates as template (template.id)}
 			<button
 				class="flex flex-col items-center rounded-md border border-gray-300 p-3 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-				on:click={() => selectTemplate(template)}
+				onclick={() => selectTemplate(template)}
 			>
 				<div
 					class="mb-2 flex h-16 w-16 items-center justify-center overflow-hidden rounded-md"
