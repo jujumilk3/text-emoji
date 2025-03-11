@@ -241,10 +241,10 @@
 							? `text-shadow: -1px -1px 0 ${template.textBorderColor}, 1px -1px 0 ${template.textBorderColor}, -1px 1px 0 ${template.textBorderColor}, 1px 1px 0 ${template.textBorderColor};`
 							: ''}
 						   {template.textGlow
-							? `filter: drop-shadow(0 0 ${Math.min(template.textGlowBlur / 2, 5)}px ${template.textGlowColor});`
+							? `filter: drop-shadow(0 0 ${Math.min(template.textGlowBlur || 0 / 2, 5)}px ${template.textGlowColor});`
 							: ''}
 						   {template.textShadow
-							? `text-shadow: ${Math.min(template.textShadowOffsetX / 2, 2)}px ${Math.min(template.textShadowOffsetY / 2, 2)}px ${Math.min(template.textShadowBlur / 2, 3)}px ${template.textShadowColor};`
+							? `text-shadow: ${Math.min(template.textShadowOffsetX || 0 / 2, 2)}px ${Math.min(template.textShadowOffsetY || 0 / 2, 2)}px ${Math.min(template.textShadowBlur || 0 / 2, 3)}px ${template.textShadowColor};`
 							: ''}"
 					>
 						{template.text.length > 10 ? template.text.substring(0, 10) + '...' : template.text}
