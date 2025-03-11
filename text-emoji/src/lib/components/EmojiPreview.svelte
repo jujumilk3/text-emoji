@@ -48,7 +48,7 @@
 		// Animation properties
 		animationEnabled = $bindable(false),
 		animationType = $bindable('none'),
-		animationSpeed = $bindable(1000),
+		animationDuration = $bindable(1000),
 		animationDelay = $bindable(0),
 		animationLoop = $bindable(true),
 		animationDirection = $bindable('normal')
@@ -127,7 +127,7 @@
 			textGlowBlur,
 			animationEnabled,
 			animationType,
-			animationSpeed,
+			animationDuration,
 			animationDelay,
 			animationLoop,
 			animationDirection,
@@ -312,7 +312,7 @@
 
 		// Calculate animation progress (0 to 1)
 		const effectiveElapsedTime = elapsedTime - animationDelay;
-		let progress = (effectiveElapsedTime % animationSpeed) / animationSpeed;
+		let progress = (effectiveElapsedTime % animationDuration) / animationDuration;
 
 		// Apply direction
 		// For sliding-text, we'll handle the direction in renderAnimationFrame
@@ -321,7 +321,7 @@
 			if (animationDirection === 'reverse') {
 				progress = 1 - progress;
 			} else if (animationDirection === 'alternate') {
-				const cycle = Math.floor(effectiveElapsedTime / animationSpeed);
+				const cycle = Math.floor(effectiveElapsedTime / animationDuration);
 				if (cycle % 2 === 1) {
 					progress = 1 - progress;
 				}
@@ -337,7 +337,7 @@
 		}
 
 		// Continue animation loop if looping is enabled
-		if (animationLoop || effectiveElapsedTime < animationSpeed) {
+		if (animationLoop || effectiveElapsedTime < animationDuration) {
 			animationFrame = requestAnimationFrame(animateEmoji);
 		} else {
 			// Render final frame if not looping
@@ -658,7 +658,7 @@
 
 			// 애니메이션 속도에 따라 프레임 간 딜레이 조정
 			// 빠른 애니메이션은 더 짧은 딜레이, 느린 애니메이션은 더 긴 딜레이
-			const speedFactor = Math.min(2, Math.max(0.5, 1000 / animationSpeed));
+			const speedFactor = Math.min(2, Math.max(0.5, 1000 / animationDuration));
 			const frameDelay = Math.max(20, Math.min(100, 40 / speedFactor));
 
 			// Stop any running animation to control our own rendering
@@ -852,7 +852,7 @@
 			textGlowBlur,
 			animationEnabled,
 			animationType,
-			animationSpeed,
+			animationDuration,
 			animationDelay,
 			animationLoop,
 			animationDirection,

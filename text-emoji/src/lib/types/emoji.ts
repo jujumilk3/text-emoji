@@ -30,7 +30,7 @@ export interface EmojiTemplate {
 	// Animation properties
 	animationEnabled?: boolean;
 	animationType?: string;
-	animationSpeed?: number;
+	animationDuration?: number;
 	animationDelay?: number;
 	animationLoop?: boolean;
 	animationDirection?: string;

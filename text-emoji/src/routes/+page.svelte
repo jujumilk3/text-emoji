@@ -41,7 +41,7 @@
 	// Animation state
 	let animationEnabled = $state(false);
 	let animationType = $state('none');
-	let animationSpeed = $state(1000);
+	let animationDuration = $state(1000);
 	let animationDelay = $state(0);
 	let animationLoop = $state(true);
 	let animationDirection = $state('normal');
@@ -97,7 +97,7 @@
 		animationEnabled = template.animationEnabled || false;
 		if (template.animationEnabled) {
 			animationType = template.animationType || animationType;
-			animationSpeed = template.animationSpeed || animationSpeed;
+			animationDuration = template.animationDuration || animationDuration;
 			animationDelay = template.animationDelay || animationDelay;
 			animationLoop = template.animationLoop || animationLoop;
 			animationDirection = template.animationDirection || animationDirection;
@@ -154,7 +154,7 @@
 		animationEnabled = emoji.animationEnabled || false;
 		if (emoji.animationEnabled) {
 			animationType = emoji.animationType || animationType;
-			animationSpeed = emoji.animationSpeed || animationSpeed;
+			animationDuration = emoji.animationDuration || animationDuration;
 			animationDelay = emoji.animationDelay || animationDelay;
 			animationLoop = emoji.animationLoop || animationLoop;
 			animationDirection = emoji.animationDirection || animationDirection;
@@ -230,7 +230,7 @@
 						<AnimationControls
 							bind:animationEnabled
 							bind:animationType
-							bind:animationSpeed
+							bind:animationDuration
 							bind:animationDelay
 							bind:animationLoop
 							bind:animationDirection
@@ -271,7 +271,7 @@
 						{textGlowBlur}
 						{animationEnabled}
 						{animationType}
-						{animationSpeed}
+						{animationDuration}
 						{animationDelay}
 						{animationLoop}
 						{animationDirection}

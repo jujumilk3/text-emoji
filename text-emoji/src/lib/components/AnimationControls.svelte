@@ -3,7 +3,7 @@
 	let {
 		animationEnabled = $bindable(false),
 		animationType = $bindable('none'),
-		animationSpeed = $bindable(1000), // in milliseconds
+		animationDuration = $bindable(1000), // in milliseconds
 		animationDelay = $bindable(0), // in milliseconds
 		animationLoop = $bindable(true),
 		animationDirection = $bindable('normal') // normal, reverse, alternate
@@ -72,16 +72,16 @@
 
 		{#if animationEnabled}
 			<div>
-				<label for="animation-speed" class="block text-sm font-medium text-gray-700">
-					Speed (ms): {animationSpeed}
+				<label for="animation-duration" class="block text-sm font-medium text-gray-700">
+					Duration (ms): {animationDuration}
 				</label>
 				<input
-					id="animation-speed"
+					id="animation-duration"
 					type="range"
 					min="100"
 					max="5000"
 					step="100"
-					bind:value={animationSpeed}
+					bind:value={animationDuration}
 					class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
 				/>
 			</div>

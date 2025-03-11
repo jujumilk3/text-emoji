@@ -97,7 +97,7 @@
 			showGradient: false,
 			animationEnabled: true,
 			animationType: 'bounce',
-			animationSpeed: 1000,
+			animationDuration: 1000,
 			animationDelay: 0,
 			animationLoop: true,
 			animationDirection: 'normal'
@@ -116,7 +116,7 @@
 			showGradient: false,
 			animationEnabled: true,
 			animationType: 'slide-left-to-right',
-			animationSpeed: 2000,
+			animationDuration: 2000,
 			animationDelay: 0,
 			animationLoop: true,
 			animationDirection: 'alternate'
@@ -135,7 +135,7 @@
 			showGradient: false,
 			animationEnabled: true,
 			animationType: 'fade-in-out',
-			animationSpeed: 2000,
+			animationDuration: 2000,
 			animationDelay: 0,
 			animationLoop: true,
 			animationDirection: 'normal'
@@ -154,7 +154,7 @@
 			showGradient: false,
 			animationEnabled: true,
 			animationType: 'rotate',
-			animationSpeed: 3000,
+			animationDuration: 3000,
 			animationDelay: 0,
 			animationLoop: true,
 			animationDirection: 'normal'
