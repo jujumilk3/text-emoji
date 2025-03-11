@@ -13,12 +13,22 @@
 			<a href="/text-emoji/">
 				<h1 class="text-primary-600 text-2xl font-bold">Text Emoji Generator</h1>
 			</a>
+			<div class="flex items-center">
+				<a
+					href="https://github.com/jujumilk3/text-emoji"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="hover:text-primary-600 text-gray-600"
+				>
+					<img src="/text-emoji/github-icon.svg" alt="GitHub" class="h-10 w-10" />
+				</a>
+			</div>
 			<!-- <nav>
-				<ul class="flex space-x-4">
-					<li><a href="/" class="hover:text-primary-600 text-gray-600">Home</a></li>
-					<li><a href="/about" class="hover:text-primary-600 text-gray-600">About</a></li>
-				</ul>
-			</nav> -->
+				  <ul class="flex space-x-4">
+					  <li><a href="/" class="hover:text-primary-600 text-gray-600">Home</a></li>
+					  <li><a href="/about" class="hover:text-primary-600 text-gray-600">About</a></li>
+				  </ul>
+			  </nav> -->
 		</div>
 	</header>
 

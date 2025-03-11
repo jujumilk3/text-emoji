@@ -8,7 +8,7 @@
 	import EmojiPreview from '$lib/components/EmojiPreview.svelte';
 	import TextEffects from '$lib/components/TextEffects.svelte';
 	import PresetTemplates from '$lib/components/PresetTemplates.svelte';
-	import RecentEmojis from '$lib/components/RecentEmojis.svelte';
+	// import RecentEmojis from '$lib/components/RecentEmojis.svelte';
 	import AnimationControls from '$lib/components/AnimationControls.svelte';
 	import { parseUrlToEmoji, copyShareableUrl } from '$lib/utils/urlParams';
 	import { findTemplateById } from '$lib/utils/templateUtils';
@@ -52,7 +52,7 @@
 
 	// References to components
 	let emojiPreviewComponent: EmojiPreview;
-	let recentEmojisComponent: RecentEmojis;
+	// let recentEmojisComponent: RecentEmojis;
 
 	// Share URL state
 	let shareUrlCopied = $state(false);
@@ -176,18 +176,18 @@
 	}
 
 	// Handle recent emoji selection
-	function handleRecentEmojiSelect(event: CustomEvent<SavedEmoji>) {
-		const emoji = event.detail;
-		applyTemplate(emoji);
-	}
+	// function handleRecentEmojiSelect(event: CustomEvent<SavedEmoji>) {
+	// 	const emoji = event.detail;
+	// 	applyTemplate(emoji);
+	// }
 
 	// Save current emoji to recent emojis
-	function saveCurrentEmoji() {
-		if (emojiPreviewComponent && recentEmojisComponent) {
-			const emojiData = emojiPreviewComponent.getEmojiData();
-			recentEmojisComponent.saveEmoji(emojiData);
-		}
-	}
+	// function saveCurrentEmoji() {
+	// 	if (emojiPreviewComponent && recentEmojisComponent) {
+	// 		const emojiData = emojiPreviewComponent.getEmojiData();
+	// 		recentEmojisComponent.saveEmoji(emojiData);
+	// 	}
+	// }
 
 	// Share current emoji as URL
 	async function shareCurrentEmoji() {
@@ -339,12 +339,12 @@
 					/>
 
 					<div class="flex justify-center space-x-4">
-						<button
+						<!-- <button
 							onclick={saveCurrentEmoji}
 							class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
 						>
 							Save to Recent
-						</button>
+						</button> -->
 
 						<button
 							onclick={shareCurrentEmoji}
@@ -358,9 +358,9 @@
 						</button>
 					</div>
 
-					<div class="overflow-hidden rounded-lg bg-white p-6 shadow">
+					<!-- <div class="overflow-hidden rounded-lg bg-white p-6 shadow">
 						<RecentEmojis bind:this={recentEmojisComponent} on:select={handleRecentEmojiSelect} />
-					</div>
+					</div> -->
 				</div>
 			</div>
 		</div>
