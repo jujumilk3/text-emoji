@@ -4,9 +4,7 @@
 	const fonts = [
 		{ id: 'sans-serif', name: 'Sans Serif', family: 'sans-serif' },
 		{ id: 'serif', name: 'Serif', family: 'serif' },
-		{ id: 'monospace', name: 'Monospace', family: 'monospace' },
-		{ id: 'cursive', name: 'Cursive', family: 'cursive' },
-		{ id: 'fantasy', name: 'Fantasy', family: 'fantasy' }
+		{ id: 'monospace', name: 'Monospace', family: 'monospace' }
 	];
 </script>
 
