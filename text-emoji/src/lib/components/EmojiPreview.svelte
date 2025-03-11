@@ -151,6 +151,8 @@
 				// Otherwise, just render once
 				stopAnimation();
 				renderEmoji();
+				// Reset sliding text canvas when switching to non-animated preset
+				slidingTextCanvas = null;
 			}
 		}
 	});
