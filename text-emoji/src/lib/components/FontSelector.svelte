@@ -1,10 +1,22 @@
 <script lang="ts">
+	import { getFontFamily } from '$lib/utils/fontUtils';
+
 	export let selectedFont = 'sans-serif';
 
 	const fonts = [
 		{ id: 'sans-serif', name: 'Sans Serif', family: 'sans-serif' },
 		{ id: 'serif', name: 'Serif', family: 'serif' },
-		{ id: 'monospace', name: 'Monospace', family: 'monospace' }
+		{ id: 'monospace', name: 'Monospace', family: 'monospace' },
+		{
+			id: 'nanum-myeongjo',
+			name: 'Nanum Myeongjo',
+			family: '"Nanum Myeongjo", serif'
+		},
+		{
+			id: 'song-myung',
+			name: 'Song Myung',
+			family: '"Song Myung", serif'
+		}
 	];
 </script>
 
@@ -25,6 +37,6 @@
 
 	<div class="mt-2 rounded-md border p-2">
 		<p class="text-sm text-gray-500">Preview:</p>
-		<p style="font-family: {selectedFont}" class="text-lg">Sample Text</p>
+		<p style="font-family: {getFontFamily(selectedFont)}" class="text-lg">Sample Text</p>
 	</div>
 </div>

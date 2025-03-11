@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import GIF from 'gif.js';
+	import { getFontFamily } from '$lib/utils/fontUtils';
 
 	// Preload the GIF worker script
 	let workerScriptLoaded = $state(false);
@@ -170,7 +171,7 @@
 		if (!tempCtx) return;
 
 		// Set font to measure text width
-		tempCtx.font = `${fontSize}px ${font}`;
+		tempCtx.font = `${fontSize}px ${getFontFamily(font)}`;
 		const textMetrics = tempCtx.measureText(text);
 
 		// Calculate total width needed for sliding text
@@ -200,7 +201,7 @@
 		ctx.fillRect(0, 0, slidingTextWidth, previewSize);
 
 		// Set text properties
-		ctx.font = `${fontSize}px ${font}`;
+		ctx.font = `${fontSize}px ${getFontFamily(font)}`;
 		ctx.textAlign = 'center';
 		ctx.textBaseline = 'middle';
 
@@ -497,7 +498,7 @@
 		y += translateY;
 
 		// Set font
-		ctx.font = `${fontSize * scale}px ${font}`;
+		ctx.font = `${fontSize * scale}px ${getFontFamily(font)}`;
 
 		// Save context for transformations
 		ctx.save();

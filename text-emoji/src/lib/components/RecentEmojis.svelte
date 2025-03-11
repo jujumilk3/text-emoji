@@ -3,6 +3,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import { CloseIcon } from '$lib/components/icons';
 	import type { SavedEmoji } from '$lib/types/emoji';
+	import { getFontFamily } from '$lib/utils/fontUtils';
 
 	// Event dispatcher for emoji selection
 	const dispatch = createEventDispatcher<{ select: SavedEmoji }>();
@@ -107,7 +108,7 @@
 								class="mb-2 flex h-20 w-20 items-center justify-center overflow-hidden rounded-md"
 								style="{getBackgroundStyle(
 									emoji
-								)} color: {emoji.textColor}; font-family: {emoji.font};"
+								)} color: {emoji.textColor}; font-family: {getFontFamily(emoji.font)};"
 							>
 								<div
 									class="overflow-hidden text-ellipsis px-1 text-center"

@@ -3,6 +3,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import type { EmojiTemplate } from '$lib/types/emoji';
 	import { templates } from '$lib/data/templates';
+	import { getFontFamily } from '$lib/utils/fontUtils';
 
 	// Event dispatcher for template selection
 	const dispatch = createEventDispatcher<{ select: EmojiTemplate }>();
@@ -46,7 +47,7 @@
 					class="mb-2 flex h-16 w-16 items-center justify-center overflow-hidden rounded-md"
 					style="{getBackgroundStyle(
 						template
-					)} color: {template.textColor}; font-family: {template.font};"
+					)} color: {template.textColor}; font-family: {getFontFamily(template.font)};"
 				>
 					<div
 						class="overflow-hidden text-ellipsis px-1 text-center"
