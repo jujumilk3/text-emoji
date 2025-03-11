@@ -57,7 +57,8 @@
 	// GIF generation settings
 	let gifQuality = $state(10); // 1-20, lower is better quality
 	let gifFrameCount = $state(30); // Default frame count
-	let gifSmoothing = $state(true); // Enable smooth transition between frames
+	let gifSmoothing = $state(false); // Enable smooth transition between frames
+	let gifOutputSize = $state(128); // Default GIF output size (same as preview size)
 
 	let canvas = $state<HTMLCanvasElement | null>(null);
 	let previewSize = 128;
@@ -637,12 +638,22 @@
 				throw new Error('GIF.js library is not properly loaded');
 			}
 
+			// Create a temporary canvas for scaling if needed
+			const tempCanvas = document.createElement('canvas');
+			tempCanvas.width = gifOutputSize;
+			tempCanvas.height = gifOutputSize;
+			const tempCtx = tempCanvas.getContext('2d');
+
+			if (!tempCtx) {
+				throw new Error('Failed to get temporary canvas context');
+			}
+
 			// Create a GIF encoder with improved quality settings
 			const gif = new GIF({
 				workers: 4, // 더 많은 워커 사용
 				quality: gifQuality, // 사용자 설정 품질
-				width: previewSize,
-				height: previewSize,
+				width: gifOutputSize,
+				height: gifOutputSize,
 				workerScript: './gif.worker.js',
 				background: backgroundColor,
 				dither: false, // 디더링 비활성화로 색상 전환 부드럽게
@@ -717,12 +728,38 @@
 				// Render the frame at this progress point
 				renderAnimationFrame(easedProgress);
 
-				// Add the current canvas content as a frame with optimized settings
-				gif.addFrame(canvas, {
-					copy: true,
-					delay: frameDelay,
-					dispose: 2 // 이전 프레임을 지우고 새 프레임 그리기 (더 부드러운 전환)
-				});
+				// Scale the frame to the desired output size if different from preview size
+				if (gifOutputSize !== previewSize && tempCtx) {
+					// Clear the temporary canvas
+					tempCtx.clearRect(0, 0, gifOutputSize, gifOutputSize);
+
+					// Draw the current frame scaled to the output size
+					tempCtx.drawImage(
+						canvas,
+						0,
+						0,
+						previewSize,
+						previewSize,
+						0,
+						0,
+						gifOutputSize,
+						gifOutputSize
+					);
+
+					// Add the scaled frame
+					gif.addFrame(tempCanvas, {
+						copy: true,
+						delay: frameDelay,
+						dispose: 2 // 이전 프레임을 지우고 새 프레임 그리기 (더 부드러운 전환)
+					});
+				} else {
+					// Add the current canvas content as a frame with optimized settings
+					gif.addFrame(canvas, {
+						copy: true,
+						delay: frameDelay,
+						dispose: 2 // 이전 프레임을 지우고 새 프레임 그리기 (더 부드러운 전환)
+					});
+				}
 
 				// Update progress (non-reactive)
 				gifProgress = ((i + 1) / actualFramesCount) * 0.8; // 80% of progress is for frame generation
@@ -858,6 +895,11 @@
 			animationDelay,
 			animationLoop,
 			animationDirection,
+			// GIF settings
+			gifQuality,
+			gifFrameCount,
+			gifSmoothing,
+			gifOutputSize,
 			imageData: canvas?.toDataURL('image/png')
 		};
 	}
@@ -958,6 +1000,73 @@
 						<span>Current: {gifFrameCount} frames</span>
 						<span>Many</span>
 					</div>
+				</div>
+
+				<div>
+					<label for="gif-size" class="block text-sm font-medium text-gray-700">
+						GIF Size (output dimensions in pixels)
+					</label>
+					<input
+						type="range"
+						id="gif-size"
+						bind:value={gifOutputSize}
+						min="32"
+						max="512"
+						step="32"
+						class="mt-1 block w-full rounded-md border-gray-300"
+					/>
+					<div class="mt-1 flex justify-between text-xs text-gray-500">
+						<span>Small</span>
+						<span>Current: {gifOutputSize}×{gifOutputSize}px</span>
+						<span>Large</span>
+					</div>
+					<div class="mt-1 flex justify-between text-xs text-gray-400">
+						<span>32px</span>
+						<span>64px</span>
+						<span>128px</span>
+						<span>256px</span>
+						<span>512px</span>
+					</div>
+					<div class="mt-2 flex space-x-2">
+						<button
+							type="button"
+							class="rounded border border-gray-300 px-2 py-1 text-xs hover:bg-gray-50"
+							onclick={() => (gifOutputSize = 32)}
+						>
+							32×32
+						</button>
+						<button
+							type="button"
+							class="rounded border border-gray-300 px-2 py-1 text-xs hover:bg-gray-50"
+							onclick={() => (gifOutputSize = 64)}
+						>
+							64×64
+						</button>
+						<button
+							type="button"
+							class="rounded border border-gray-300 px-2 py-1 text-xs hover:bg-gray-50"
+							onclick={() => (gifOutputSize = 128)}
+						>
+							128×128
+						</button>
+						<button
+							type="button"
+							class="rounded border border-gray-300 px-2 py-1 text-xs hover:bg-gray-50"
+							onclick={() => (gifOutputSize = 256)}
+						>
+							256×256
+						</button>
+						<button
+							type="button"
+							class="rounded border border-gray-300 px-2 py-1 text-xs hover:bg-gray-50"
+							onclick={() => (gifOutputSize = 512)}
+						>
+							512×512
+						</button>
+					</div>
+					<p class="mt-1 text-xs italic text-gray-500">
+						Note: This only affects the exported GIF file size, not the preview.
+					</p>
 				</div>
 
 				<div class="flex items-center">
