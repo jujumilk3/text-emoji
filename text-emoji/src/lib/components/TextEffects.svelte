@@ -48,7 +48,7 @@
 				</div>
 				<div>
 					<label for="shadow-blur" class="block text-sm font-medium text-gray-700">
-						Blur (px)
+						Blur (px): {textShadowBlur}
 					</label>
 					<input
 						id="shadow-blur"
@@ -61,7 +61,7 @@
 				</div>
 				<div>
 					<label for="shadow-x" class="block text-sm font-medium text-gray-700">
-						Offset X (px)
+						Offset X (px): {textShadowOffsetX}
 					</label>
 					<input
 						id="shadow-x"
@@ -74,7 +74,7 @@
 				</div>
 				<div>
 					<label for="shadow-y" class="block text-sm font-medium text-gray-700">
-						Offset Y (px)
+						Offset Y (px): {textShadowOffsetY}
 					</label>
 					<input
 						id="shadow-y"
@@ -118,7 +118,7 @@
 				</div>
 				<div>
 					<label for="border-width" class="block text-sm font-medium text-gray-700">
-						Border Width (px)
+						Border Width (px): {textBorderWidth}
 					</label>
 					<input
 						id="border-width"
@@ -162,7 +162,7 @@
 				</div>
 				<div>
 					<label for="glow-blur" class="block text-sm font-medium text-gray-700">
-						Glow Intensity
+						Glow Intensity: {textGlowBlur}
 					</label>
 					<input
 						id="glow-blur"
