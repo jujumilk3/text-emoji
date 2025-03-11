@@ -70,6 +70,9 @@
 	let gifProgress = 0;
 	let displayGifProgress = $state(0);
 
+	// Add a reactive variable for the preview image URL
+	let previewImageUrl = $state<string>('');
+
 	// For sliding text animation
 	let slidingTextCanvas = $state<HTMLCanvasElement | null>(null);
 	let slidingTextWidth = $state(0);
@@ -158,6 +161,11 @@
 		preloadWorkerScript();
 		// Setup key listeners and store cleanup function
 		const cleanup = setupKeyListeners();
+
+		// Initialize the preview image URL after the first render
+		if (canvas) {
+			previewImageUrl = canvas.toDataURL('image/png');
+		}
 
 		// Return cleanup function for onMount
 		return () => {
@@ -323,12 +331,22 @@
 		// Render frame with animation progress
 		renderAnimationFrame(progress);
 
+		// Update the preview image URL after rendering
+		if (canvas) {
+			previewImageUrl = canvas.toDataURL('image/png');
+		}
+
 		// Continue animation loop if looping is enabled
 		if (animationLoop || effectiveElapsedTime < animationSpeed) {
 			animationFrame = requestAnimationFrame(animateEmoji);
 		} else {
 			// Render final frame if not looping
 			renderAnimationFrame(animationDirection === 'reverse' ? 0 : 1);
+
+			// Update the preview image URL after rendering the final frame
+			if (canvas) {
+				previewImageUrl = canvas.toDataURL('image/png');
+			}
 		}
 	}
 
@@ -556,6 +574,11 @@
 		} else {
 			// Render without animation
 			renderAnimationFrame(0);
+		}
+
+		// Update the preview image URL after rendering
+		if (canvas) {
+			previewImageUrl = canvas.toDataURL('image/png');
 		}
 	}
 
@@ -855,7 +878,7 @@
 					<p class="mb-1 text-xs text-gray-500">Small</p>
 					<div class="h-8 w-8 overflow-hidden rounded-md border">
 						<img
-							src={canvas?.toDataURL('image/png')}
+							src={previewImageUrl}
 							alt="Small preview"
 							width={smallPreviewSize}
 							height={smallPreviewSize}
@@ -867,7 +890,7 @@
 					<p class="mb-1 text-xs text-gray-500">Medium</p>
 					<div class="h-12 w-12 overflow-hidden rounded-md border">
 						<img
-							src={canvas?.toDataURL('image/png')}
+							src={previewImageUrl}
 							alt="Medium preview"
 							width={smallPreviewSize * 1.5}
 							height={smallPreviewSize * 1.5}
@@ -879,7 +902,7 @@
 					<p class="mb-1 text-xs text-gray-500">Large</p>
 					<div class="h-16 w-16 overflow-hidden rounded-md border">
 						<img
-							src={canvas?.toDataURL('image/png')}
+							src={previewImageUrl}
 							alt="Large preview"
 							width={smallPreviewSize * 2}
 							height={smallPreviewSize * 2}
