@@ -2,10 +2,9 @@
 	export let value = '';
 	export let maxLength = 10;
 	export let placeholder = 'Enter text for emoji';
-	export let rows = 2;
 
 	function handleInput(event: Event) {
-		const target = event.target as HTMLTextAreaElement;
+		const target = event.target as HTMLInputElement;
 		if (target.value.length > maxLength) {
 			value = target.value.slice(0, maxLength);
 		} else {
@@ -18,14 +17,14 @@
 	<label for="emoji-text" class="block text-sm font-medium text-gray-700"> Emoji Text </label>
 
 	<div class="relative">
-		<textarea
+		<input
+			type="text"
 			id="emoji-text"
-			{rows}
 			{placeholder}
 			bind:value
-			on:input={handleInput}
-			class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
-		></textarea>
+			oninput={handleInput}
+			class="focus:border-primary-500 focus:ring-primary-500 block h-12 w-full rounded-md border-gray-300 p-3 shadow-sm sm:text-lg"
+		/>
 
 		<div class="absolute bottom-2 right-2 text-xs text-gray-500">
 			{value.length}/{maxLength}
