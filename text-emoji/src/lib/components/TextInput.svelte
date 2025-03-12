@@ -1,10 +1,10 @@
 <script lang="ts">
 	export let value = '';
-	export let maxLength = 10;
+	export let maxLength = 20;
 	export let placeholder = 'Enter text for emoji';
 
 	function handleInput(event: Event) {
-		const target = event.target as HTMLInputElement;
+		const target = event.target as HTMLTextAreaElement;
 		if (target.value.length > maxLength) {
 			value = target.value.slice(0, maxLength);
 		} else {
@@ -17,14 +17,14 @@
 	<label for="emoji-text" class="block text-sm font-medium text-gray-700"> Emoji Text </label>
 
 	<div class="relative">
-		<input
-			type="text"
+		<textarea
 			id="emoji-text"
 			{placeholder}
 			bind:value
 			oninput={handleInput}
-			class="focus:border-primary-500 focus:ring-primary-500 block h-12 w-full rounded-md border-gray-300 p-3 shadow-sm sm:text-lg"
-		/>
+			rows="3"
+			class="focus:border-primary-500 focus:ring-primary-500 block w-full resize-none rounded-md border-gray-300 p-3 shadow-sm sm:text-lg"
+		></textarea>
 
 		<div class="absolute bottom-2 right-2 text-xs text-gray-500">
 			{value.length}/{maxLength}

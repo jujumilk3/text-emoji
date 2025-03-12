@@ -172,24 +172,45 @@
 
 		// Set font to measure text width
 		tempCtx.font = `${fontSize}px ${getFontFamily(font)}`;
-		const textMetrics = tempCtx.measureText(text);
+
+		// Handle multiline text
+		let maxWidth = 0;
+		let totalHeight = previewSize;
+
+		if (text.includes('\n')) {
+			const lines = text.split('\n');
+			const lineHeight = fontSize * 1.2; // Add some line spacing
+
+			// Find the widest line
+			lines.forEach((line) => {
+				const textMetrics = tempCtx.measureText(line);
+				maxWidth = Math.max(maxWidth, Math.ceil(textMetrics.width));
+			});
+
+			// Calculate total height needed
+			totalHeight = lineHeight * lines.length;
+		} else {
+			// Single line text (original behavior)
+			const textMetrics = tempCtx.measureText(text);
+			maxWidth = Math.ceil(textMetrics.width);
+		}
 
 		// Calculate total width needed for sliding text
 		// Add extra padding on both sides to ensure smooth scrolling in both directions
-		slidingTextWidth = Math.ceil(textMetrics.width) + slidingTextPadding * 2;
+		slidingTextWidth = maxWidth + slidingTextPadding * 2;
 
 		// Create or resize the sliding text canvas
 		if (!slidingTextCanvas) {
 			slidingTextCanvas = document.createElement('canvas');
 		}
 		slidingTextCanvas.width = slidingTextWidth;
-		slidingTextCanvas.height = previewSize;
+		slidingTextCanvas.height = Math.max(previewSize, totalHeight);
 
 		const ctx = slidingTextCanvas.getContext('2d');
 		if (!ctx) return;
 
 		// Clear canvas
-		ctx.clearRect(0, 0, slidingTextWidth, previewSize);
+		ctx.clearRect(0, 0, slidingTextWidth, slidingTextCanvas.height);
 
 		// Draw background
 		if (showGradient) {
@@ -198,48 +219,100 @@
 		} else {
 			ctx.fillStyle = backgroundColor;
 		}
-		ctx.fillRect(0, 0, slidingTextWidth, previewSize);
+		ctx.fillRect(0, 0, slidingTextWidth, slidingTextCanvas.height);
 
 		// Set text properties
 		ctx.font = `${fontSize}px ${getFontFamily(font)}`;
 		ctx.textAlign = 'center';
 		ctx.textBaseline = 'middle';
 
-		// Apply text effects
-		if (textGlow) {
-			ctx.save();
-			ctx.shadowColor = textGlowColor;
-			ctx.shadowBlur = textGlowBlur;
-			ctx.shadowOffsetX = 0;
-			ctx.shadowOffsetY = 0;
-			ctx.fillStyle = textGlowColor;
-			ctx.globalAlpha = 0.7;
+		// Handle multiline text
+		if (text.includes('\n')) {
+			const lines = text.split('\n');
+			const lineHeight = fontSize * 1.2;
+			const totalTextHeight = lineHeight * lines.length;
+
+			// Calculate starting Y position
+			let startY = (slidingTextCanvas.height - totalTextHeight) / 2 + lineHeight / 2;
+
+			// Draw each line with effects
+			lines.forEach((line, index) => {
+				const lineY = startY + index * lineHeight;
+
+				// Apply text effects for each line
+				if (textGlow) {
+					ctx.save();
+					ctx.shadowColor = textGlowColor;
+					ctx.shadowBlur = textGlowBlur;
+					ctx.shadowOffsetX = 0;
+					ctx.shadowOffsetY = 0;
+					ctx.fillStyle = textGlowColor;
+					ctx.globalAlpha = 0.7;
+					ctx.fillText(line, slidingTextWidth / 2, lineY);
+					ctx.restore();
+				}
+
+				if (textShadow) {
+					ctx.save();
+					ctx.fillStyle = textShadowColor;
+					ctx.shadowColor = textShadowColor;
+					ctx.shadowBlur = textShadowBlur;
+					ctx.shadowOffsetX = textShadowOffsetX;
+					ctx.shadowOffsetY = textShadowOffsetY;
+					ctx.fillText(line, slidingTextWidth / 2, lineY);
+					ctx.restore();
+				}
+
+				if (textBorder) {
+					ctx.save();
+					ctx.strokeStyle = textBorderColor;
+					ctx.lineWidth = textBorderWidth;
+					ctx.strokeText(line, slidingTextWidth / 2, lineY);
+					ctx.restore();
+				}
+
+				// Draw main text
+				ctx.fillStyle = textColor;
+				ctx.fillText(line, slidingTextWidth / 2, lineY);
+			});
+		} else {
+			// Single line text (original behavior)
+			// Apply text effects
+			if (textGlow) {
+				ctx.save();
+				ctx.shadowColor = textGlowColor;
+				ctx.shadowBlur = textGlowBlur;
+				ctx.shadowOffsetX = 0;
+				ctx.shadowOffsetY = 0;
+				ctx.fillStyle = textGlowColor;
+				ctx.globalAlpha = 0.7;
+				ctx.fillText(text, slidingTextWidth / 2, previewSize / 2);
+				ctx.restore();
+			}
+
+			if (textShadow) {
+				ctx.save();
+				ctx.fillStyle = textShadowColor;
+				ctx.shadowColor = textShadowColor;
+				ctx.shadowBlur = textShadowBlur;
+				ctx.shadowOffsetX = textShadowOffsetX;
+				ctx.shadowOffsetY = textShadowOffsetY;
+				ctx.fillText(text, slidingTextWidth / 2, previewSize / 2);
+				ctx.restore();
+			}
+
+			if (textBorder) {
+				ctx.save();
+				ctx.strokeStyle = textBorderColor;
+				ctx.lineWidth = textBorderWidth;
+				ctx.strokeText(text, slidingTextWidth / 2, previewSize / 2);
+				ctx.restore();
+			}
+
+			// Draw main text
+			ctx.fillStyle = textColor;
 			ctx.fillText(text, slidingTextWidth / 2, previewSize / 2);
-			ctx.restore();
 		}
-
-		if (textShadow) {
-			ctx.save();
-			ctx.fillStyle = textShadowColor;
-			ctx.shadowColor = textShadowColor;
-			ctx.shadowBlur = textShadowBlur;
-			ctx.shadowOffsetX = textShadowOffsetX;
-			ctx.shadowOffsetY = textShadowOffsetY;
-			ctx.fillText(text, slidingTextWidth / 2, previewSize / 2);
-			ctx.restore();
-		}
-
-		if (textBorder) {
-			ctx.save();
-			ctx.strokeStyle = textBorderColor;
-			ctx.lineWidth = textBorderWidth;
-			ctx.strokeText(text, slidingTextWidth / 2, previewSize / 2);
-			ctx.restore();
-		}
-
-		// Draw main text
-		ctx.fillStyle = textColor;
-		ctx.fillText(text, slidingTextWidth / 2, previewSize / 2);
 	}
 
 	// Create gradient for sliding text canvas
@@ -249,9 +322,14 @@
 		if (gradientDirection === 'to-right') {
 			gradient = ctx.createLinearGradient(0, 0, slidingTextWidth, 0);
 		} else if (gradientDirection === 'to-bottom') {
-			gradient = ctx.createLinearGradient(0, 0, 0, previewSize);
+			gradient = ctx.createLinearGradient(0, 0, 0, slidingTextCanvas?.height || previewSize);
 		} else {
-			gradient = ctx.createLinearGradient(0, 0, slidingTextWidth, previewSize);
+			gradient = ctx.createLinearGradient(
+				0,
+				0,
+				slidingTextWidth,
+				slidingTextCanvas?.height || previewSize
+			);
 		}
 
 		gradient.addColorStop(0, backgroundColor);
@@ -523,7 +601,30 @@
 			ctx.shadowOffsetY = 0;
 			ctx.fillStyle = textGlowColor;
 			ctx.globalAlpha = 0.7 * alpha;
-			ctx.fillText(text, x, y);
+
+			// Handle multiline text for glow effect
+			if (text.includes('\n')) {
+				const lines = text.split('\n');
+				const lineHeight = fontSize * scale * 1.2;
+				const totalHeight = lineHeight * (lines.length - 1);
+
+				let startY;
+				if (verticalAlign === 'middle') {
+					startY = y - totalHeight / 2;
+				} else if (verticalAlign === 'bottom') {
+					startY = y - totalHeight;
+				} else {
+					startY = y;
+				}
+
+				lines.forEach((line, index) => {
+					const lineY = startY + index * lineHeight;
+					ctx.fillText(line, x, lineY);
+				});
+			} else {
+				ctx.fillText(text, x, y);
+			}
+
 			ctx.restore();
 		}
 
@@ -535,7 +636,30 @@
 			ctx.shadowBlur = textShadowBlur;
 			ctx.shadowOffsetX = textShadowOffsetX;
 			ctx.shadowOffsetY = textShadowOffsetY;
-			ctx.fillText(text, x, y);
+
+			// Handle multiline text for shadow effect
+			if (text.includes('\n')) {
+				const lines = text.split('\n');
+				const lineHeight = fontSize * scale * 1.2;
+				const totalHeight = lineHeight * (lines.length - 1);
+
+				let startY;
+				if (verticalAlign === 'middle') {
+					startY = y - totalHeight / 2;
+				} else if (verticalAlign === 'bottom') {
+					startY = y - totalHeight;
+				} else {
+					startY = y;
+				}
+
+				lines.forEach((line, index) => {
+					const lineY = startY + index * lineHeight;
+					ctx.fillText(line, x, lineY);
+				});
+			} else {
+				ctx.fillText(text, x, y);
+			}
+
 			ctx.restore();
 		}
 
@@ -544,13 +668,70 @@
 			ctx.save();
 			ctx.strokeStyle = textBorderColor;
 			ctx.lineWidth = textBorderWidth;
-			ctx.strokeText(text, x, y);
+
+			// Handle multiline text for border effect
+			if (text.includes('\n')) {
+				const lines = text.split('\n');
+				const lineHeight = fontSize * scale * 1.2;
+				const totalHeight = lineHeight * (lines.length - 1);
+
+				let startY;
+				if (verticalAlign === 'middle') {
+					startY = y - totalHeight / 2;
+				} else if (verticalAlign === 'bottom') {
+					startY = y - totalHeight;
+				} else {
+					startY = y;
+				}
+
+				lines.forEach((line, index) => {
+					const lineY = startY + index * lineHeight;
+					ctx.strokeText(line, x, lineY);
+				});
+			} else {
+				ctx.strokeText(text, x, y);
+			}
+
 			ctx.restore();
 		}
 
 		// Draw main text
 		ctx.fillStyle = textColor;
-		ctx.fillText(text, x, y);
+
+		// Handle multiline text
+		if (text.includes('\n')) {
+			const lines = text.split('\n');
+			const lineHeight = fontSize * scale * 1.2; // Add some line spacing
+			const totalHeight = lineHeight * (lines.length - 1);
+
+			// Calculate starting Y position based on vertical alignment
+			let startY;
+			if (verticalAlign === 'middle') {
+				startY = y - totalHeight / 2;
+			} else if (verticalAlign === 'bottom') {
+				startY = y - totalHeight;
+			} else {
+				startY = y;
+			}
+
+			// Draw each line
+			lines.forEach((line, index) => {
+				const lineY = startY + index * lineHeight;
+				ctx.fillText(line, x, lineY);
+
+				// Apply the same effects to each line if needed
+				if (textBorder) {
+					ctx.save();
+					ctx.strokeStyle = textBorderColor;
+					ctx.lineWidth = textBorderWidth;
+					ctx.strokeText(line, x, lineY);
+					ctx.restore();
+				}
+			});
+		} else {
+			// Single line text (original behavior)
+			ctx.fillText(text, x, y);
+		}
 
 		// Restore context
 		ctx.restore();
