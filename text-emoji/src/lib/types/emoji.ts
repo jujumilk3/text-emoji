@@ -11,6 +11,7 @@ export interface EmojiTemplate {
 	backgroundColor: string;
 	fontSize: number;
 	padding?: number;
+	lineHeight?: number;
 	horizontalAlign: string;
 	verticalAlign: string;
 	showGradient: boolean;

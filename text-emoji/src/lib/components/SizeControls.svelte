@@ -1,5 +1,6 @@
 <script lang="ts">
 	export let fontSize = 32;
+	export let lineHeight = 1.0;
 	export let horizontalAlign = 'center';
 	export let verticalAlign = 'middle';
 
@@ -31,6 +32,21 @@
 				min="12"
 				max="200"
 				bind:value={fontSize}
+				class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
+			/>
+		</div>
+
+		<div>
+			<label for="line-height" class="block text-sm font-medium text-gray-700">
+				Line Height: {lineHeight.toFixed(1)}
+			</label>
+			<input
+				id="line-height"
+				type="range"
+				min="0.8"
+				max="2.0"
+				step="0.1"
+				bind:value={lineHeight}
 				class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
 			/>
 		</div>

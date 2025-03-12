@@ -31,6 +31,7 @@
 		fontSize = $bindable(32),
 		horizontalAlign = $bindable('center'),
 		verticalAlign = $bindable('middle'),
+		lineHeight = $bindable(1.0),
 		showGradient = $bindable(false),
 		gradientColor = $bindable('#ffffff'),
 		gradientDirection = $bindable('to-right'),
@@ -93,6 +94,7 @@
 			fontSize,
 			horizontalAlign,
 			verticalAlign,
+			lineHeight,
 			showGradient,
 			gradientColor,
 			gradientDirection,
@@ -177,7 +179,7 @@
 
 		if (text.includes('\n')) {
 			const lines = text.split('\n');
-			const lineHeight = fontSize * 1.2; // Add some line spacing
+			const calculatedLineHeight = fontSize * lineHeight; // Use the lineHeight property
 
 			// Find the widest line
 			lines.forEach((line) => {
@@ -186,7 +188,7 @@
 			});
 
 			// Calculate total height needed
-			totalHeight = lineHeight * lines.length;
+			totalHeight = calculatedLineHeight * lines.length;
 		} else {
 			// Single line text (original behavior)
 			const textMetrics = tempCtx.measureText(text);
@@ -227,15 +229,15 @@
 		// Handle multiline text
 		if (text.includes('\n')) {
 			const lines = text.split('\n');
-			const lineHeight = fontSize * 1.2;
-			const totalTextHeight = lineHeight * lines.length;
+			const calculatedLineHeight = fontSize * lineHeight; // Use the lineHeight property
+			const totalTextHeight = calculatedLineHeight * lines.length;
 
 			// Calculate starting Y position
-			let startY = (slidingTextCanvas.height - totalTextHeight) / 2 + lineHeight / 2;
+			let startY = (slidingTextCanvas.height - totalTextHeight) / 2 + calculatedLineHeight / 2;
 
 			// Draw each line with effects
 			lines.forEach((line, index) => {
-				const lineY = startY + index * lineHeight;
+				const lineY = startY + index * calculatedLineHeight;
 
 				// Apply text effects for each line
 				if (textGlow) {
@@ -603,8 +605,8 @@
 			// Handle multiline text for glow effect
 			if (text.includes('\n')) {
 				const lines = text.split('\n');
-				const lineHeight = fontSize * scale * 1.2;
-				const totalHeight = lineHeight * (lines.length - 1);
+				const calculatedLineHeight = fontSize * scale * lineHeight;
+				const totalHeight = calculatedLineHeight * (lines.length - 1);
 
 				let startY;
 				if (verticalAlign === 'middle') {
@@ -616,7 +618,7 @@
 				}
 
 				lines.forEach((line, index) => {
-					const lineY = startY + index * lineHeight;
+					const lineY = startY + index * calculatedLineHeight;
 					ctx.fillText(line, x, lineY);
 				});
 			} else {
@@ -638,8 +640,8 @@
 			// Handle multiline text for shadow effect
 			if (text.includes('\n')) {
 				const lines = text.split('\n');
-				const lineHeight = fontSize * scale * 1.2;
-				const totalHeight = lineHeight * (lines.length - 1);
+				const calculatedLineHeight = fontSize * scale * lineHeight;
+				const totalHeight = calculatedLineHeight * (lines.length - 1);
 
 				let startY;
 				if (verticalAlign === 'middle') {
@@ -651,7 +653,7 @@
 				}
 
 				lines.forEach((line, index) => {
-					const lineY = startY + index * lineHeight;
+					const lineY = startY + index * calculatedLineHeight;
 					ctx.fillText(line, x, lineY);
 				});
 			} else {
@@ -670,8 +672,8 @@
 			// Handle multiline text for border effect
 			if (text.includes('\n')) {
 				const lines = text.split('\n');
-				const lineHeight = fontSize * scale * 1.2;
-				const totalHeight = lineHeight * (lines.length - 1);
+				const calculatedLineHeight = fontSize * scale * lineHeight;
+				const totalHeight = calculatedLineHeight * (lines.length - 1);
 
 				let startY;
 				if (verticalAlign === 'middle') {
@@ -683,7 +685,7 @@
 				}
 
 				lines.forEach((line, index) => {
-					const lineY = startY + index * lineHeight;
+					const lineY = startY + index * calculatedLineHeight;
 					ctx.strokeText(line, x, lineY);
 				});
 			} else {
@@ -699,8 +701,8 @@
 		// Handle multiline text
 		if (text.includes('\n')) {
 			const lines = text.split('\n');
-			const lineHeight = fontSize * scale * 1.2; // Add some line spacing
-			const totalHeight = lineHeight * (lines.length - 1);
+			const calculatedLineHeight = fontSize * scale * lineHeight;
+			const totalHeight = calculatedLineHeight * (lines.length - 1);
 
 			// Calculate starting Y position based on vertical alignment
 			let startY;
@@ -714,7 +716,7 @@
 
 			// Draw each line
 			lines.forEach((line, index) => {
-				const lineY = startY + index * lineHeight;
+				const lineY = startY + index * calculatedLineHeight;
 				ctx.fillText(line, x, lineY);
 
 				// Apply the same effects to each line if needed
@@ -1039,6 +1041,7 @@
 			backgroundColor,
 			fontSize,
 			padding: 10,
+			lineHeight,
 			horizontalAlign,
 			verticalAlign,
 			showGradient,

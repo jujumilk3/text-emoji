@@ -20,6 +20,7 @@
 	let textColor = $state('#000000');
 	let backgroundColor = $state('#ffffff');
 	let fontSize = $state(72);
+	let lineHeight = $state(1.0);
 	let horizontalAlign = $state('center');
 	let verticalAlign = $state('middle');
 	let showGradient = $state(false);
@@ -69,6 +70,7 @@
 		textColor = template.textColor;
 		backgroundColor = template.backgroundColor;
 		fontSize = template.fontSize;
+		lineHeight = template.lineHeight ?? 1.0;
 		horizontalAlign = template.horizontalAlign;
 		verticalAlign = template.verticalAlign;
 		showGradient = template.showGradient;
@@ -123,6 +125,7 @@
 		if (template.textColor) textColor = template.textColor;
 		if (template.backgroundColor) backgroundColor = template.backgroundColor;
 		if (template.fontSize) fontSize = template.fontSize;
+		if (template.lineHeight !== undefined) lineHeight = template.lineHeight;
 		if (template.horizontalAlign) horizontalAlign = template.horizontalAlign;
 		if (template.verticalAlign) verticalAlign = template.verticalAlign;
 
@@ -265,7 +268,7 @@
 					</div>
 
 					<div class="overflow-hidden rounded-lg bg-white p-6 shadow">
-						<SizeControls bind:fontSize bind:horizontalAlign bind:verticalAlign />
+						<SizeControls bind:fontSize bind:lineHeight bind:horizontalAlign bind:verticalAlign />
 					</div>
 
 					<div class="overflow-hidden rounded-lg bg-white p-6 shadow">
@@ -310,6 +313,7 @@
 						{textColor}
 						{backgroundColor}
 						{fontSize}
+						{lineHeight}
 						{horizontalAlign}
 						{verticalAlign}
 						{showGradient}

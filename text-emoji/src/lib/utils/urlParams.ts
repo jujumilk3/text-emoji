@@ -15,6 +15,7 @@ export function serializeEmojiToUrl(template: EmojiTemplate): string {
   params.set('bgColor', template.backgroundColor.replace('#', ''));
   params.set('fontSize', template.fontSize.toString());
   params.set('padding', (template.padding ?? 10).toString());
+  params.set('lineHeight', (template.lineHeight ?? 1.0).toString());
   params.set('hAlign', template.horizontalAlign);
   params.set('vAlign', template.verticalAlign);
   
@@ -110,6 +111,7 @@ export function parseUrlToEmoji(url: URL | URLSearchParams): Partial<EmojiTempla
   if (params.has('bgColor')) template.backgroundColor = `#${params.get('bgColor') ?? 'ffffff'}`;
   if (params.has('fontSize')) template.fontSize = parseInt(params.get('fontSize') ?? '32', 10);
   if (params.has('padding')) template.padding = parseInt(params.get('padding') ?? '10', 10);
+  if (params.has('lineHeight')) template.lineHeight = parseFloat(params.get('lineHeight') ?? '1.2');
   if (params.has('hAlign')) template.horizontalAlign = params.get('hAlign') ?? 'center';
   if (params.has('vAlign')) template.verticalAlign = params.get('vAlign') ?? 'middle';
   
