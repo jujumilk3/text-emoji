@@ -191,5 +191,30 @@ export const templates: EmojiTemplate[] = [
     textShadowBlur: 4,
     textShadowOffsetX: 3,
     textShadowOffsetY: 3
+  },
+  {
+    id: 'template-11',
+    name: '경계 철저',
+    text: '경계\n철저',
+    font: 'sans-serif',
+    textColor: '#ffffff',
+    backgroundColor: '#000000',
+    fontSize: 47,
+    padding: 10,
+    lineHeight: 1.0,
+    horizontalAlign: 'center',
+    verticalAlign: 'middle',
+    showGradient: false,
+    animationEnabled: true,
+    animationType: 'pulse',
+    animationDuration: 1000,
+    animationDelay: 0,
+    animationLoop: true,
+    animationDirection: 'normal',
+    textShadow: true,
+    textShadowColor: '#000000',
+    textShadowBlur: 4,
+    textShadowOffsetX: 3,
+    textShadowOffsetY: 3
   }
 ]; 
