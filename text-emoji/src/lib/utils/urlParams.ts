@@ -14,7 +14,7 @@ export function serializeEmojiToUrl(template: EmojiTemplate): string {
   params.set('textColor', template.textColor.replace('#', ''));
   params.set('bgColor', template.backgroundColor.replace('#', ''));
   params.set('fontSize', template.fontSize.toString());
-  params.set('padding', template.padding.toString());
+  params.set('padding', (template.padding ?? 10).toString());
   params.set('hAlign', template.horizontalAlign);
   params.set('vAlign', template.verticalAlign);
   

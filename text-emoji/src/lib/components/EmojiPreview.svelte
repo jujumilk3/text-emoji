@@ -29,7 +29,6 @@
 		textColor = $bindable('#000000'),
 		backgroundColor = $bindable('#ffffff'),
 		fontSize = $bindable(32),
-		padding = $bindable(10),
 		horizontalAlign = $bindable('center'),
 		verticalAlign = $bindable('middle'),
 		showGradient = $bindable(false),
@@ -92,7 +91,6 @@
 			textColor,
 			backgroundColor,
 			fontSize,
-			padding,
 			horizontalAlign,
 			verticalAlign,
 			showGradient,
@@ -508,14 +506,14 @@
 			horizontalAlign === 'center'
 				? previewSize / 2
 				: horizontalAlign === 'right'
-					? previewSize - padding
-					: padding;
+					? previewSize - 10
+					: 10;
 		const baseY =
 			verticalAlign === 'middle'
 				? previewSize / 2
 				: verticalAlign === 'bottom'
-					? previewSize - padding
-					: padding;
+					? previewSize - 10
+					: 10;
 
 		// Apply animation transformations
 		let x = baseX;
@@ -1040,7 +1038,7 @@
 			textColor,
 			backgroundColor,
 			fontSize,
-			padding,
+			padding: 10,
 			horizontalAlign,
 			verticalAlign,
 			showGradient,

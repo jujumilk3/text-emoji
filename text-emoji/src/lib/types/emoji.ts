@@ -10,7 +10,7 @@ export interface EmojiTemplate {
 	textColor: string;
 	backgroundColor: string;
 	fontSize: number;
-	padding: number;
+	padding?: number;
 	horizontalAlign: string;
 	verticalAlign: string;
 	showGradient: boolean;

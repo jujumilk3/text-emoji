@@ -1,6 +1,5 @@
 <script lang="ts">
 	export let fontSize = 32;
-	export let padding = 10;
 	export let horizontalAlign = 'center';
 	export let verticalAlign = 'middle';
 
@@ -32,20 +31,6 @@
 				min="12"
 				max="200"
 				bind:value={fontSize}
-				class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
-			/>
-		</div>
-
-		<div>
-			<label for="padding" class="block text-sm font-medium text-gray-700">
-				Padding (px): {padding}
-			</label>
-			<input
-				id="padding"
-				type="range"
-				min="0"
-				max="30"
-				bind:value={padding}
 				class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
 			/>
 		</div>
