@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Optimize crawling rate
+Crawl-delay: 1 
