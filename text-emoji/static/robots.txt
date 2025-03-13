@@ -1,5 +1,11 @@
+# robots.txt for Text Emoji Generator
+# https://jujumilk3.github.io/text-emoji/
+
 User-agent: *
 Allow: /
+
+# Allow all search engines to access all content
+Sitemap: https://jujumilk3.github.io/text-emoji/sitemap.xml
 
 # Optimize crawling rate
 Crawl-delay: 1 
